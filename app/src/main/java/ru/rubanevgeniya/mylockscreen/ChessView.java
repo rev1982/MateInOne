@@ -181,6 +181,7 @@ public class ChessView extends View {
 
   @Override
   protected void onDraw(Canvas canvas) {
+    // TODO: change printZZZ mathod names to drawZZZ
     if (!isInitialChessPositionReady) {
       findStartPosition(canvas);
     } else {
@@ -430,11 +431,11 @@ public class ChessView extends View {
   }
 
 
-  private void printChessPosition(Canvas canvas, String startPosition) {
+  private void printChessPosition(Canvas canvas, String startPosition) { // TDOD: startPosition argument is not needed, it is a field
 
     if (!isInitialChessPositionReady) {
 
-      fontPaint.setTextSize(4 * fontSize);//120
+      fontPaint.setTextSize(4 * fontSize);
       fontPaint.setTextAlign(Paint.Align.CENTER);
       Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), "fonts/Chess-7.TTF");
       fontPaint.setTypeface(typeface);

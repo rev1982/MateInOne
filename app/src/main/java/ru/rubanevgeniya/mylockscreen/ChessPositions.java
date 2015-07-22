@@ -12,6 +12,9 @@ public class ChessPositions {
   protected static ArrayList<String> allAnswers;
   private static String TAG = "Log ChessPositions = ";
 
+  // TODO: this function can be a static initializer
+  // TODO: allStartPositions and  allAnswers can be static
+  // TODO: add more problems? xml resource file seems better or change ArrayList to just String[]
   protected static void createInitialChessPosition() {
     Log.d(TAG,"createInitialChessPosition()" );
     allStartPositions = new ArrayList<String>();
@@ -40,6 +43,14 @@ public class ChessPositions {
       loadUnsolvedLevels.add(Integer.toString(indOfPosition));
       lockScreenApp.saveUnsolvedLevels(loadUnsolvedLevels);
     }
+
+    // TODO: compare the following code with the code above
+//    Set<String> loadUnsolvedLevels = lockScreenApp.loadUnsolvedLevels();
+//    if (loadUnsolvedLevels == null) {
+//      loadUnsolvedLevels = new HashSet<>();
+//    }
+//    loadUnsolvedLevels.add(Integer.toString(indOfPosition));
+//    lockScreenApp.saveUnsolvedLevels(loadUnsolvedLevels);
   }
 
   protected static void removeSolvedPositionFromUnsolvedPositions(int indOfPosition, LockScreenApp lockScreenApp) {
