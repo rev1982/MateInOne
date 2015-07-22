@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyLockScreen</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="blackToMove">ЧЕРНЫЕ ходят </string>
+    <string name="andCheckmate"> и выигрывают</string>
+    <string name="whiteToMove">БЕЛЫЕ ходят </string>
+    <string name="levels"> задачи</string>
+    <string name="levels3"> задач</string>
+    <string name="level"> задачу</string>
+    <string name="toUnlockSolve0">чтобы разблокировать экран,</string>
+    <string name="toUnlockSolve">решите </string>
+    <string name="rusString">решенных задач : </string>
+    <string name="solved"> </string>
+    <string name="NumberOfLevels">Количество уровней : </string>
+    <string name="NumberOfSolvedLevels">Решенных уровней : </string>
+    <string name="NumberOfAttempts">Попыток : </string>
+
+    <string name="toUnlock">чтобы разблокировать экран, поставьте мат оппоненту или нажмите кнопку с замком, чтобы ввести секретный код</string>
+    <string name="chooseOneItem">выберите одну фигуру</string>
+    <string name="enterTheSecretCode">Введите секретный код</string>
+    <string name="clear">отмена</string>
+    <string name="enter">ввести</string>
+    <string name="backToChess"> обратно к шахматам   </string>
+    <string name="Settings">Настройки</string>
+    <string name="tryOnceMore">попробуйте еще раз</string>
+    <string name="enterTheSecretCodeAndThenPressSettings">введите секретный код и нажмите кнопку "настройки"</string>
+    <string name="toUnlockEnter">чтобы разблокировать экран, введите секретный код или нажмите кнопку "обратно к шахматам"</string>
+    <string name="lengthIsMoteThen6">длина более 6 символов</string>
+    <string name="lengthIs0">длина равна 0</string>
+    <string name="approveSecretCodeCorrectly">правильно подтвердите секретный код</string>
+    <string name="onlyDigits">только цифры от 0 до 9; максимум 6 символов</string>
+    <string name="ApproveTheSecretCode">Подтвердите секретный код</string>
+    <string name="cancel">отмена</string>
+    <string name="Illuminate">Подсвечивать все возможные ходы выбранной шахматной фигуры</string>
+    <string name="SetNumberOfLevelsToSolveBeforeUnlock">Количество уровней, которое нужно решить для разблокировки экрана \n     </string>
+    <string name="SetNumberOfLevelsToSolveBeforeUnlockHorizontal">Количество уровней, которое нужно решить для разблокировки экрана</string>
+    <string name="SetNumberOfAttempts">Количество попыток при решении одного уровня \n      </string>
+    <string name="SetDelay">Временной интервал между моментом включения устройства и моментом блокировки экрана</string>
+    <string name="DelayInSeconds">Интервал (секунды) : </string>
+    <string name="SetAmountOfTimeToLeaveTheDeviceUnlock">Интервал времени после успешного решения, в течении которого устройство не будет блокироваться</string>
+    <string name="Days">Дни:</string>
+    <string name="Hours">Часы:</string>
+    <string name="Minutes">Мин.:</string>
+    <string name="backToChess2">обратно к шахматам</string>
+    <string name="Results">Результаты</string>
+    <string name="Ok">Ок</string>
+
+</resources>

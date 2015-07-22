@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="mycolor">#FFDFAF7F</color>
+    <color name="mycolor3">#FFFBE5AC</color>
+    <color name="mycolor2">#FF9A764F</color>
+    <color name="mycolor4">#069A86B8</color>
+    <color name="mycolor5">#98bea678</color>
+    <color name="mycolor6">#3b000000</color>
+    <color name="mybrown1">#d1d1d1</color>
+    <color name="mybrown2">#aea085</color>
+    <color name="mybrown3">#847767</color>
+    <color name="mybrown4">#57493e</color>
+    <color name="mybrown5">#372e29</color>
+    <color name="myblue1">#d1ddeb</color>
+    <color name="myblue2">#95acca</color>
+    <color name="myblue22">#FFD0DCEF</color>
+    <color name="myblue3">#3f5374</color>
+    <color name="myblue4">#2a3549</color>
+    <color name="myblue5">#1a202a</color>
+    <color name="mygray1">#edf2f8</color>
+    <color name="mygray22">#98949FBE</color>
+    <color name="mygray2">#d2dae7</color>
+    <color name="mygray3">#919db7</color>
+    <color name="mygray4">#5b627e</color>
+    <color name="mygray5">#FF7888B7</color>
+    <color name="mygray6">#3b000000</color>
+    <color name="mybg1">#eceff1</color>
+    <color name="mybg2">#cfd8dc</color>
+    <color name="mybg3">#b0bec5</color>
+    <color name="mybg4">#90a4ae</color>
+    <color name="mybg5">#78909c</color>
+    <color name="mybg6">#607d8b</color>
+    <color name="mybg7">#546e7a</color>
+    <color name="mybg8">#455a64</color>
+    <color name="mybg9">#37474f</color>
+    <color name="mybg10">#263238</color>
+
+</resources>
