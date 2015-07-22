@@ -7,6 +7,7 @@ package ru.rubanevgeniya.mylockscreen;
 // TODO: remove more than 2 subsequent empty lines
 // TODO: remove debug output Log.d(), Log.i() and System.out, System err
 // TODO: find and execute all TODOs in all files
+// TODO: check method access: most method should be protected or private. public if needed, package-access is unusual
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;

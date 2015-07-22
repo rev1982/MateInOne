@@ -15,6 +15,8 @@ public class King extends  Figure {
         possibleMoveX.clear();
         possibleMoveY.clear();
         //System.out.println("finding possible move for king");
+        // TODO: if (color == 'w') is not needed; just call addPosition(figureOnDesk, enemyColor(color));
+        // TODO: ... and addShortCastling(figureOnDesk, color, enemyColor(color));
         if(color == 'w'){
             addPosition(figureOnDesk,'b');
             if(isShortCastlingPossible) {
@@ -34,9 +36,11 @@ public class King extends  Figure {
         }
     }
 
+    // TODO: enemy color is not needed because color != enemyColor
+    // TODO: color is not needed either because color == this.color?
     void  addShortCastling(Figure[][] figureOnDesk, char color, char enemyColor){
         int yCoordinate;
-        if(color == 'w'){
+        if(color == 'w'){ // TODO: yCoordinate = color == 'w' ? 0 : 7;
             yCoordinate = 0;
         } else {
             yCoordinate = 7;
@@ -48,10 +52,11 @@ public class King extends  Figure {
                 && (figureOnDesk[7][yCoordinate].color == color) && (!figureOnDesk[7][yCoordinate].wasMoved)
                 && (figureOnDesk[6][yCoordinate] == null) && (figureOnDesk[5][yCoordinate] == null)){
 
-            int[] kingCellsY = new int[]{yCoordinate,yCoordinate,yCoordinate};
-            int[] kingCellsX = new int[]{4,5,6};
+            int[] kingCellsY = new int[]{yCoordinate,yCoordinate,yCoordinate}; // TODO: should be two static final arrays: for white and black
+            int[] kingCellsX = new int[]{4,5,6}; // TODO: should be two static final arrays: for white and black
             for (int i = 0; i < 8; i++){
                 for (int j = 0; j < 8; j++){
+                    // TODO: this if is not needed if you return right after isShortCastlingPossible = false
                     if (!isShortCastlingPossible){
                         break;
                     }else {
@@ -65,6 +70,7 @@ public class King extends  Figure {
                                     for (int m = 0; m < kingCellsX.length; m++) {
                                         if (xMove == kingCellsX[m] && yMove == kingCellsY[m]) {
                                             isShortCastlingPossible = false;
+                                            // TODO: if no further iterations needed then break the outer loop or just return
                                             break;
                                         }
                                     }
@@ -77,10 +83,12 @@ public class King extends  Figure {
             possibleMoveX.add(6);
             possibleMoveY.add(yCoordinate);
         } else {
-            isShortCastlingPossible = false;
+            isShortCastlingPossible = false; // TODO: first put the shorter branch in if-then statemenet
         }
     }
 
+    // TODO: it should be possible to make one method for both kind of castlings
+    // TODO: ... addLongCastling(Figure[][] board, boolean isLong)
     void  addLongCastling(Figure[][] figureOnDesk, char color, char enemyColor){
         int yCoordinate;
         if(color == 'w'){
@@ -96,8 +104,8 @@ public class King extends  Figure {
                 && (figureOnDesk[2][yCoordinate] == null)
                 && (figureOnDesk[3][yCoordinate] == null)){
 
-            int[] kingCellsY = new int[]{yCoordinate,yCoordinate,yCoordinate};
-            int[] kingCellsX = new int[]{2,3,4};
+            int[] kingCellsY = new int[]{yCoordinate,yCoordinate,yCoordinate}; // TODO: should be two static final arrays: for white and black
+            int[] kingCellsX = new int[]{2,3,4}; // TODO: should be two static final arrays: for white and black
             for (int i = 0; i < 8; i++){
                 for (int j = 0; j < 8; j++){
                     if (!isLongCastlingPossible){

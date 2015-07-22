@@ -8,7 +8,7 @@ public abstract class Figure {
   protected String image;
   protected int positionX; // TODO: change to Pos pos; or posX, posY;
   protected int positionY;
-  protected char color;
+  protected char color; // TODO: make it boolean??? and rename to isWhite; opposite color would be !isWhite
   protected String type; // TODO: change String to a new enum Type and do not compare types with Strings.equal()
 
   // TODO: introduce a class Pos {int x; int y;} and replace all parallel use of X and Y with one Pos
