@@ -9,11 +9,11 @@ import android.view.View;
 import android.widget.ImageView;
 
 public class DialogPawn extends DialogFragment {
-    protected char color;
+    protected boolean isWhite;
     protected boolean isNewItemChosen = false;
-    protected String chosenItem;
+    protected Figure.Type chosenItem;
     protected CharSequence[] charSequences;
-    protected ChessView board;
+    protected ChessView chessView;
     private CharSequence[] blackItems = new CharSequence[]{"\u265B ","\u265C ","\u265D ","\u265E "};
     private  String title = getResources().getString(R.string.chooseOneItem);
     private static String TAG = "Log = ";
@@ -22,7 +22,7 @@ public class DialogPawn extends DialogFragment {
     public android.app.Dialog onCreateDialog(Bundle savedInstanceState) {
         CharSequence[] whiteItems = new CharSequence[]{"\u2655 ","\u2656 ","\u2657 ","\u2658 "};
         charSequences = blackItems;
-        if(color == 'w'){
+        if(isWhite){
             charSequences = whiteItems;
         }
 
@@ -32,16 +32,16 @@ public class DialogPawn extends DialogFragment {
                 .setItems(charSequences, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
-                            chosenItem = "queen";
+                            chosenItem = Figure.Type.queen;
                             afterChoice();
                         } else if (which == 1) {
-                            chosenItem = "rook";
+                            chosenItem = Figure.Type.rook;
                             afterChoice();
                         } else  if (which == 2) {
-                            chosenItem = "bishop";
+                            chosenItem = Figure.Type.bishop;
                             afterChoice();
                         } else if (which == 3) {
-                            chosenItem = "knight";
+                            chosenItem = Figure.Type.knight;
                             afterChoice();
                         }
                     }
@@ -53,11 +53,11 @@ public class DialogPawn extends DialogFragment {
 
     private void afterChoice(){
         Log.d(TAG, "chosen item = " + chosenItem);
-        board.chosenItem = chosenItem;
+        chessView.chosenItem = chosenItem;
         isNewItemChosen = true;
         Log.d(TAG,"isNewItemChosen = "+isNewItemChosen);
-        board.isNewItemChosen = isNewItemChosen;
-        board.invalidate();
-        board.afterDialogPawn();
+        chessView.isNewItemChosen = isNewItemChosen;
+        chessView.invalidate();
+        chessView.afterDialogPawn();
     }
 }

@@ -32,25 +32,14 @@ public class ChessPositions {
 
   protected static void saveUnsolvedPosition(int indOfPosition, LockScreenApp lockScreenApp) {
     Set<String> loadUnsolvedLevels = lockScreenApp.loadUnsolvedLevels();
-    //if (!(loadUnsolvedLevels != null)) {
     if (loadUnsolvedLevels == null) {
+      loadUnsolvedLevels = new HashSet<>();
       Log.d(TAG, "saving 1-st unsolved position " + indOfPosition);
-      Set<String> setOfUnsolvedPositions = new HashSet<>();
-      setOfUnsolvedPositions.add(Integer.toString(indOfPosition));
-      lockScreenApp.saveUnsolvedLevels(setOfUnsolvedPositions);
     } else {
       Log.d(TAG, "saving (adding) unsolved position " + indOfPosition);
-      loadUnsolvedLevels.add(Integer.toString(indOfPosition));
-      lockScreenApp.saveUnsolvedLevels(loadUnsolvedLevels);
     }
-
-    // TODO: compare the following code with the code above
-//    Set<String> loadUnsolvedLevels = lockScreenApp.loadUnsolvedLevels();
-//    if (loadUnsolvedLevels == null) {
-//      loadUnsolvedLevels = new HashSet<>();
-//    }
-//    loadUnsolvedLevels.add(Integer.toString(indOfPosition));
-//    lockScreenApp.saveUnsolvedLevels(loadUnsolvedLevels);
+    loadUnsolvedLevels.add(Integer.toString(indOfPosition));
+    lockScreenApp.saveUnsolvedLevels(loadUnsolvedLevels);
   }
 
   protected static void removeSolvedPositionFromUnsolvedPositions(int indOfPosition, LockScreenApp lockScreenApp) {

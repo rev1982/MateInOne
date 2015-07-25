@@ -30,6 +30,7 @@ public class LockScreenReceiver extends BroadcastReceiver {
     private long timeOfCreatingIntent2;
     private static String TAG = "Log LockScreenReceiver : ";
     protected   static  boolean needToStartLock;
+    protected  static boolean startSecondActivity;
 
 
 
@@ -67,10 +68,22 @@ public class LockScreenReceiver extends BroadcastReceiver {
                     Log.d(TAG, " point 3.0.1 start activity ");
                     Intent intent11;
                     if (intent.getIntExtra("code",0) == 1111) {
+                        //new!!!
+                        if (lockScreenApp != null){
+                            needToAlive = false;
+                            lockScreenApp.finish();
+                        }
+                        //end new!!
                         intent11 = new Intent(context, LockScreenApp.class);
                         intent11.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(intent11);
                     } else if (intent.getIntExtra("code",0) == 5555) {
+                        //new!!!
+                        if (secondActivity != null){
+                            needToAlive = false;
+                            secondActivity.finish();
+                        }
+                        //end new!!
                         intent11 = new Intent(context, SecondActivity.class);
                         intent11.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(intent11);

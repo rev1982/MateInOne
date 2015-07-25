@@ -56,7 +56,7 @@ public class ChessView extends View {
   private final String[] LETTERS = new String[]{"a", "b", "c", "d", "e", "f", "g", "h"};
   private String startPosition;
   private int indOfPosition;
-  private Desk desk;
+  private Board board;
   private boolean isInitialChessPositionReady;
   private final float[] coordinatesInDeskSellsFloatX = new float[8];
   private final float[] coordinatesInDeskSellsFloatY = new float[8];
@@ -64,8 +64,7 @@ public class ChessView extends View {
   private float[] movingCoordinatesX;
   private float[] movingCoordinatesY;
   private int currentItemIndex = 0;
-  private ArrayList<Integer> possibleCoordinatesX = new ArrayList<>();
-  private ArrayList<Integer> possibleCoordinatesY = new ArrayList<>();
+  private ArrayList<Pos> possibleCoordinates = new ArrayList<>();
   private boolean drag = false;
   private float dragX = 0;
   private float dragY = 0;
@@ -95,7 +94,7 @@ public class ChessView extends View {
   private int startY;
   private int finishY;
   private Figure currentFigure;
-  protected String chosenItem;
+  protected Figure.Type chosenItem;
   protected boolean isNewItemChosen = false;
   private DialogPawn dialogPawn;
   protected boolean isNewDeskReady = false;
@@ -142,6 +141,7 @@ public class ChessView extends View {
   private String refresh = "\uF021";
   float xInfoLeft;
   float yInfoTop;
+  private  boolean isWhiteTurnToPlay;
 
 
   public ChessView(Context context, AttributeSet attrs) {
@@ -149,7 +149,7 @@ public class ChessView extends View {
     lockScreenApp = (LockScreenApp) getContext();
 
     isInitialChessPositionReady = false;
-    Desk.figureOnDesk = new Figure[8][8];
+    Board.figureOnDesk = new Figure[8][8];
     ChessPositions.createInitialChessPosition();
     myTimerTask = new MyTimerTask();
     timer.schedule(myTimerTask,
@@ -181,6 +181,7 @@ public class ChessView extends View {
 
   @Override
   protected void onDraw(Canvas canvas) {
+    //Log.d(TAG,"onDraw +++");
     // TODO: change printZZZ mathod names to drawZZZ
     if (!isInitialChessPositionReady) {
       findStartPosition(canvas);
@@ -266,8 +267,8 @@ public class ChessView extends View {
     fontPaint.setTextSize(fSize);
     int height = 0;
     int width = 0;
-    for (int i = 0; i < desk.allFigures.length; i++) {
-      fontPaint.getTextBounds(desk.allFigures[i].image, 0, 1, rect1);
+    for (int i = 0; i < board.allFigures.length; i++) {
+      fontPaint.getTextBounds(board.allFigures[i].image, 0, 1, rect1);
       if (rect1.bottom - rect1.top > height) {
         height = rect1.bottom - rect1.top;
       }
@@ -419,11 +420,11 @@ public class ChessView extends View {
     if (startPosition.charAt(startPosition.length() - 1) == 'b') {
       isPlayingWhite = false;
       whoseTurnToPlay = 'b';
-      //Log.d(TAG,"whoseTurnToPlay = "+whoseTurnToPlay);
+      isWhiteTurnToPlay = false;
     } else {
       isPlayingWhite = true;
       whoseTurnToPlay = 'w';
-      //Log.d(TAG,"whoseTurnToPlay = " + whoseTurnToPlay);
+      isWhiteTurnToPlay = true;
     }
 
     findCoordinatesInSells();
@@ -434,30 +435,33 @@ public class ChessView extends View {
   private void printChessPosition(Canvas canvas, String startPosition) { // TDOD: startPosition argument is not needed, it is a field
 
     if (!isInitialChessPositionReady) {
+      lockScreenApp.handler.removeCallbacksAndMessages(null);
 
       fontPaint.setTextSize(4 * fontSize);
       fontPaint.setTextAlign(Paint.Align.CENTER);
       Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), "fonts/Chess-7.TTF");
       fontPaint.setTypeface(typeface);
 
-      desk = new Desk(startPosition);
-      desk.createStartPosition();
+      board = new Board(startPosition);
+      board.createStartPosition();
       int fontSizeForChess = findFontSizeForChess();//!!!!!!!!!!!!!!!!
       //Log.d(TAG,"fontSizeForChess = " + fontSizeForChess);
       isInitialChessPositionReady = true;
-      movingCoordinatesX = new float[desk.allFigures.length];
-      movingCoordinatesY = new float[desk.allFigures.length];
-      for (int i = 0; i < desk.allFigures.length; i++) {
-        movingCoordinatesX[i] = coordinatesInDeskSellsFloatX[desk.allFigures[i].positionX];
-        movingCoordinatesY[i] = coordinatesInDeskSellsFloatY[desk.allFigures[i].positionY];
-        if (desk.allFigures[i].color == 'w') {
+      movingCoordinatesX = new float[board.allFigures.length];
+      movingCoordinatesY = new float[board.allFigures.length];
+      for (int i = 0; i < board.allFigures.length; i++) {
+        movingCoordinatesX[i] = coordinatesInDeskSellsFloatX[board.allFigures[i].posX];
+        movingCoordinatesY[i] = coordinatesInDeskSellsFloatY[board.allFigures[i].posY];
+        if (board.allFigures[i].isWhite) {
           fontPaint.setColor(Color.WHITE);
         } else {
           fontPaint.setColor(Color.BLACK);
         }
         fontPaint.setTextSize(fontSizeForChess);//120!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        canvas.drawText(desk.allFigures[i].image, coordinatesInDeskSellsFloatX[desk.allFigures[i].positionX],
-                coordinatesInDeskSellsFloatY[desk.allFigures[i].positionY], fontPaint);
+        Log.d(TAG, ("start position : " + board.allFigures[i].type + " " +
+                board.allFigures[i].isWhite + " " + board.allFigures[i].posX + " " + board.allFigures[i].posY));
+                canvas.drawText(board.allFigures[i].image, coordinatesInDeskSellsFloatX[board.allFigures[i].posX],
+                        coordinatesInDeskSellsFloatY[board.allFigures[i].posY], fontPaint);
       }
       isInitialChessPositionReady = true;
     } else {
@@ -466,18 +470,18 @@ public class ChessView extends View {
         printCircles(canvas);
       }
 
-      for (int i = 0; i < desk.allFigures.length; i++) {
-        if (desk.allFigures[i] != null
+      for (int i = 0; i < board.allFigures.length; i++) {
+        if (board.allFigures[i] != null
                 && movingCoordinatesX[i] <= clipBound.right
                 && movingCoordinatesX[i] >= clipBound.left
                 && movingCoordinatesY[i] >= clipBound.top
                 && movingCoordinatesY[i] <= clipBound.bottom) {
-          if (desk.allFigures[i].color == 'w') {
+          if (board.allFigures[i].isWhite) {
             fontPaint.setColor(Color.WHITE);
           } else {
             fontPaint.setColor(Color.BLACK);
           }
-          canvas.drawText(desk.allFigures[i].image, movingCoordinatesX[i],
+          canvas.drawText(board.allFigures[i].image, movingCoordinatesX[i],
                   movingCoordinatesY[i], fontPaint);
         }
       }
@@ -555,18 +559,18 @@ public class ChessView extends View {
 
   private void printCircles(Canvas canvas) {
     Square square;
-    for (int i = 0; i < possibleCoordinatesY.size(); i++) {
+    for (int i = 0; i < possibleCoordinates.size(); i++) {
       if (isPlayingWhite) {
         if (isPortrait) {
-          square = BoardView.squareArray[possibleCoordinatesX.get(i)][possibleCoordinatesY.get(i)];//++
+          square = BoardView.squareArray[possibleCoordinates.get(i).x][possibleCoordinates.get(i).y];//++
         } else {
-          square = BoardViewLand.squareArray[possibleCoordinatesX.get(i)][possibleCoordinatesY.get(i)];//++
+          square = BoardViewLand.squareArray[possibleCoordinates.get(i).x][possibleCoordinates.get(i).y];//++
         }
       } else {
         if (isPortrait) {
-          square = BoardView.squareArray[7 - possibleCoordinatesX.get(i)][7 - possibleCoordinatesY.get(i)];//++
+          square = BoardView.squareArray[7 - possibleCoordinates.get(i).x][7 - possibleCoordinates.get(i).y];//++
         } else {
-          square = BoardViewLand.squareArray[7 - possibleCoordinatesX.get(i)][7 - possibleCoordinatesY.get(i)];//++
+          square = BoardViewLand.squareArray[7 - possibleCoordinates.get(i).x][7 - possibleCoordinates.get(i).y];//++
         }
       }
       if (square.color == 'b') {
@@ -591,8 +595,7 @@ public class ChessView extends View {
       switch (event.getAction()) {
         case MotionEvent.ACTION_DOWN:
 
-          isPrintingCircles = false;//***
-          //Log.d(TAG,"isPrintingCircles = "+isPrintingCircles);
+          isPrintingCircles = false;
 
           if (isRightMove && lockScreenApp.isLockScreen) {//touching screen after right move and unlocking the screen
             lockScreenApp.saveInfo("alreadyResolved", null);
@@ -621,11 +624,10 @@ public class ChessView extends View {
               LockScreenReceiver.needToAlive = false;
               lockScreenApp.saveInfoForOuter("time", Long.toString(System.currentTimeMillis()));
               //Log.d(TAG, "chessView : lockScreenApp.loadOuterInfo(\"time\") = " + lockScreenApp.loadOuterInfo("time"));
-              Desk.figureOnDesk = new Figure[8][8];
+              Board.figureOnDesk = new Figure[8][8];
               lockScreenApp.saveInfo("amountOfJustSolvedLevels", null);//**
               lockScreenApp.finish();
-              possibleCoordinatesX = null;//**
-              possibleCoordinatesY = null;//**
+              possibleCoordinates = null;//**
 
             } else {
               int needToSolve = Integer.parseInt(amountOfLevelsToSolve);
@@ -644,18 +646,16 @@ public class ChessView extends View {
                 }
                 myTimerTask = null;
                 LockScreenReceiver.needToAlive = false;
-                Desk.figureOnDesk = new Figure[8][8];
+                Board.figureOnDesk = new Figure[8][8];
                 isEverythingSolved = true;
                 lockScreenApp.saveInfoForOuter("isLocked", "no");
                 lockScreenApp.finish();
-                possibleCoordinatesX = null;//**
-                possibleCoordinatesY = null;//**
+                possibleCoordinates = null;//**
               } else {
                 isRightMove = false;
                 isInitialChessPositionReady = false;
-                possibleCoordinatesX = null;//**
-                possibleCoordinatesY = null;//**
-                Desk.figureOnDesk = new Figure[8][8];
+                possibleCoordinates = null;//**
+                Board.figureOnDesk = new Figure[8][8];
                 invalidate();
               }
             }
@@ -683,7 +683,7 @@ public class ChessView extends View {
                 timer = null;
               }
               myTimerTask = null;
-              Desk.figureOnDesk = new Figure[8][8];
+              Board.figureOnDesk = new Figure[8][8];
               lockScreenApp.finish();
             }
             if (evX >= xNextLeft//touching "forward" icon to get new level when it is not lockScreen
@@ -694,9 +694,8 @@ public class ChessView extends View {
               //Log.d(TAG, "touching \"forward\" icon to get new level when it is not lockScreen");
               isRightMove = false;
               isInitialChessPositionReady = false;
-              Desk.figureOnDesk = new Figure[8][8];
-              possibleCoordinatesX = null;
-              possibleCoordinatesY = null;
+              Board.figureOnDesk = new Figure[8][8];
+              possibleCoordinates = null;
               invalidate();
             }
 
@@ -715,7 +714,9 @@ public class ChessView extends View {
               myTimerTask = null;
             }
             LockScreenReceiver.needToAlive = false;//!!
-            lockScreenApp.startSecondActivity();
+            //lockScreenApp.startSecondActivity();
+            LockScreenReceiver.startSecondActivity = true;
+            lockScreenApp.finish();
 
           }
 
@@ -741,7 +742,7 @@ public class ChessView extends View {
                     ) {
               isWrongMove = false;
               isInitialChessPositionReady = false;
-              Desk.figureOnDesk = new Figure[8][8];
+              Board.figureOnDesk = new Figure[8][8];
               lockScreenApp.saveInfo("alreadyResolved", null);
               invalidate();
             }
@@ -758,7 +759,7 @@ public class ChessView extends View {
                         oldLoadUnsolvedLevels, oldIsLevelFromUnsolved, lockScreenApp);
                 isWrongMove = false;
                 isInitialChessPositionReady = false;
-                Desk.figureOnDesk = new Figure[8][8];
+                Board.figureOnDesk = new Figure[8][8];
 
                 if (numberOfAlreadyResolved == null) {
                   lockScreenApp.saveInfo("alreadyResolved", "1");
@@ -774,27 +775,22 @@ public class ChessView extends View {
           } else {
 
             for (int i = 0; i < movingCoordinatesY.length; i++) {
-              if ((desk.allFigures[i] != null) && evX >= movingCoordinatesX[i] - squareSize / 2
+              if ((board.allFigures[i] != null) && evX >= movingCoordinatesX[i] - squareSize / 2
                       && evX <= movingCoordinatesX[i] + squareSize / 3
                       && evY >= movingCoordinatesY[i] - squareSize / (1.1)
                       && evY <= movingCoordinatesY[i] + squareSize / 10
-                      && desk.allFigures[i].color == whoseTurnToPlay) {
+                      && board.allFigures[i].isWhite == isWhiteTurnToPlay) {
                 currentItemIndex = i;
-                currentFigure = desk.allFigures[currentItemIndex];
-                isPrintingCircles = true;//***
-                //Log.d(TAG,"isPrintingCircles = "+isPrintingCircles);
+                currentFigure = board.allFigures[currentItemIndex];
+                isPrintingCircles = true;
                 Log.d(TAG, "______________________________");
-                Log.d(TAG, "currentItemIndex = " + currentItemIndex + ",  " + desk.allFigures[i].type);
-                startX = desk.allFigures[currentItemIndex].positionX;
-                startY = desk.allFigures[currentItemIndex].positionY;
-                // Log.d(TAG,"startX = " + desk.allFigures[currentItemIndex].positionX +
-                //       ", startY = " + desk.allFigures[currentItemIndex].positionY);
-                desk.findPossibleMove(currentItemIndex);
-                possibleCoordinatesX = desk.possibleMoveX;
-                possibleCoordinatesY = desk.possibleMoveY;
-//                                for(int k = 0; k < possibleCoordinatesX.size(); k++){
-//                                     System.out.println("possible coor = "+possibleCoordinatesX.get(k)+" "+possibleCoordinatesY.get(k));
-//                                }
+                Log.d(TAG, "currentItemIndex = " + currentItemIndex + ",  " + board.allFigures[i].type);
+                startX = board.allFigures[currentItemIndex].posX;
+                startY = board.allFigures[currentItemIndex].posY;
+                // Log.d(TAG,"startX = " + board.allFigures[currentItemIndex].positionX +
+                //       ", startY = " + board.allFigures[currentItemIndex].positionY);
+                board.findPossibleMove(currentItemIndex);
+                possibleCoordinates = board.possibleMove;
                 isItemMoving = true;
 
                 invalidate();
@@ -807,23 +803,23 @@ public class ChessView extends View {
 
             if (!isItemMoving) {
               //Log.d(TAG, "before second touch");
-              if (possibleCoordinatesX != null && possibleCoordinatesX.size() > 0) { //after choosing item we touch one of the possible cells
+              if (possibleCoordinates != null && possibleCoordinates.size() > 0) { //after choosing item we touch one of the possible cells
 
                 //Log.d(TAG, "before second touch 2 ");
-                for (int i = 0; i < possibleCoordinatesX.size(); i++) {
+                for (int i = 0; i < possibleCoordinates.size(); i++) {
 
-                  if (evX - coordinatesInDeskSellsFloatX[possibleCoordinatesX.get(i)] < squareSize / 2
-                          && evX - coordinatesInDeskSellsFloatX[possibleCoordinatesX.get(i)] > -squareSize / 2
-                          && evY - coordinatesInDeskSellsFloatY[possibleCoordinatesY.get(i)] +
+                  if (evX - coordinatesInDeskSellsFloatX[possibleCoordinates.get(i).x] < squareSize / 2
+                          && evX - coordinatesInDeskSellsFloatX[possibleCoordinates.get(i).x] > -squareSize / 2
+                          && evY - coordinatesInDeskSellsFloatY[possibleCoordinates.get(i).y] +
                           (squareSize / (3.1f) + squareSize / 12) < squareSize / 2
-                          && evY - coordinatesInDeskSellsFloatY[possibleCoordinatesY.get(i)] +
+                          && evY - coordinatesInDeskSellsFloatY[possibleCoordinates.get(i).y] +
                           (squareSize / (3.1f) + squareSize / 12) > -squareSize / 2) {
 
                     //Log.d(TAG, "second touch");
                     isSecondTouch = true;
                     indOfPossibleMoveSecondTouch = i;
-                    movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[possibleCoordinatesX.get(i)] - 10;
-                    movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[possibleCoordinatesY.get(i)] - 10;
+                    movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[possibleCoordinates.get(i).x] - 10;
+                    movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[possibleCoordinates.get(i).y] - 10;
                     isItemMoving = true;
                     invalidate();
 
@@ -850,25 +846,25 @@ public class ChessView extends View {
 
             boolean isMoveCorrect = false;
 
-            for (int k = 0; k < possibleCoordinatesY.size(); k++) {
-              if ((movingCoordinatesX[currentItemIndex] >= coordinatesInDeskSellsFloatX[possibleCoordinatesX.get(k)] - squareSize / 2) &&
-                      (movingCoordinatesX[currentItemIndex] <= coordinatesInDeskSellsFloatX[possibleCoordinatesX.get(k)] + squareSize / 2) &&
-                      (movingCoordinatesY[currentItemIndex] >= coordinatesInDeskSellsFloatY[possibleCoordinatesY.get(k)] - squareSize / 2) &&
-                      (movingCoordinatesY[currentItemIndex] <= coordinatesInDeskSellsFloatY[possibleCoordinatesY.get(k)] + squareSize / (2))) {
+            for (int k = 0; k < possibleCoordinates.size(); k++) {
+              if ((movingCoordinatesX[currentItemIndex] >= coordinatesInDeskSellsFloatX[possibleCoordinates.get(k).x] - squareSize / 2) &&
+                      (movingCoordinatesX[currentItemIndex] <= coordinatesInDeskSellsFloatX[possibleCoordinates.get(k).x] + squareSize / 2) &&
+                      (movingCoordinatesY[currentItemIndex] >= coordinatesInDeskSellsFloatY[possibleCoordinates.get(k).y] - squareSize / 2) &&
+                      (movingCoordinatesY[currentItemIndex] <= coordinatesInDeskSellsFloatY[possibleCoordinates.get(k).y] + squareSize / (2))) {
                 Log.d(TAG, "isMoveCorrect = true;");
-                movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[possibleCoordinatesX.get(k)];
-                movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[possibleCoordinatesY.get(k)];
+                movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[possibleCoordinates.get(k).x];
+                movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[possibleCoordinates.get(k).y];
                 isMoveCorrect = true;
-                desk.deskAndFigureAfterMove(currentItemIndex, k);
+                board.deskAndFigureAfterMove(currentItemIndex, k);
               }
-              if (desk.isAlreadyCaptured) {
+              if (board.isAlreadyCaptured) {
                 Log.d(TAG, "time to stop");
                 drag = false; //finish moving of this item
               }
             }
             if (!isMoveCorrect) {
-              movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[desk.allFigures[currentItemIndex].positionX];
-              movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[desk.allFigures[currentItemIndex].positionY];
+              movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[board.allFigures[currentItemIndex].posX];
+              movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[board.allFigures[currentItemIndex].posY];
               Log.d(TAG, "isMoveCorrect = false;");
             }
           }
@@ -877,28 +873,28 @@ public class ChessView extends View {
         case MotionEvent.ACTION_UP:
 
           if (isSecondTouch) {
-            movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[possibleCoordinatesX.get(indOfPossibleMoveSecondTouch)];
-            movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[possibleCoordinatesY.get(indOfPossibleMoveSecondTouch)];
-            desk.deskAndFigureAfterMove(currentItemIndex, indOfPossibleMoveSecondTouch);
+            movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[possibleCoordinates.get(indOfPossibleMoveSecondTouch).x];
+            movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[possibleCoordinates.get(indOfPossibleMoveSecondTouch).y];
+            board.deskAndFigureAfterMove(currentItemIndex, indOfPossibleMoveSecondTouch);
             isSecondTouch = false;
             invalidate();
           }
 
           drag = false;
-          desk.isAlreadyCaptured = false;
+          board.isAlreadyCaptured = false;
           isItemMoving = false;
           invalidate();
           if (currentFigure != null) {
-            finishX = currentFigure.positionX;
-            finishY = currentFigure.positionY;
+            finishX = currentFigure.posX;
+            finishY = currentFigure.posY;
             //Log.d(TAG,"finishX = " + currentFigure.positionX +
             //", finishY = " + currentFigure.positionY);
 
-            if (currentFigure.type.equals("king")) {// if castling - moving rook
-              int rookInd = desk.deskAndFiguresAfterCastling(startX, finishX, startY);
+            if (currentFigure.type == Figure.Type.king) {// if castling - moving rook
+              int rookInd = board.deskAndFiguresAfterCastling(startX, finishX, startY);
               if (rookInd != -1) {
-                movingCoordinatesX[rookInd] = coordinatesInDeskSellsFloatX[desk.allFigures[rookInd].positionX];
-                movingCoordinatesY[rookInd] = coordinatesInDeskSellsFloatY[desk.allFigures[rookInd].positionY];
+                movingCoordinatesX[rookInd] = coordinatesInDeskSellsFloatX[board.allFigures[rookInd].posX];
+                movingCoordinatesY[rookInd] = coordinatesInDeskSellsFloatY[board.allFigures[rookInd].posY];
 
                 invalidate(Math.max(0, (int) (movingCoordinatesX[currentItemIndex] - 2 * squareSize)),
                         Math.max(0, (int) (movingCoordinatesY[currentItemIndex] - 5 * squareSize)),
@@ -907,12 +903,12 @@ public class ChessView extends View {
               }
             }
 
-            if (currentFigure.type.equals("pawn")
-                    && (currentFigure.color == 'w' && currentFigure.positionY == 7
-                    || currentFigure.color == 'b' && currentFigure.positionY == 0)) {
+            if (currentFigure.type == Figure.Type.pawn
+                    && (currentFigure.isWhite && currentFigure.posY == 7
+                    || !currentFigure.isWhite && currentFigure.posY == 0)) {
               dialogPawn = new DialogPawn();
-              dialogPawn.board = this;
-              dialogPawn.color = currentFigure.color;
+              dialogPawn.chessView = this;
+              dialogPawn.isWhite = currentFigure.isWhite;
 
               synchronized (this) {
                 Log.d(TAG, "before start dialog");
@@ -934,28 +930,48 @@ public class ChessView extends View {
             }
           }
 
-
-          //Log.d(TAG,"startX finishX    startY finishY" + startX + " " + finishX + " " + startY + " " + finishY);
           if (startX != finishX || startY != finishY) { //check if this move was write or wrong
 
-            //isPrintingCircles = false;
+            char figureTypeChar = ' ';
+            char colorChar = ' ';
+            switch (currentFigure.type) {
+              case rook:
+                figureTypeChar = 'R';
+                break;
+              case knight:
+                figureTypeChar = 'N';
+                break;
+              case bishop:
+                figureTypeChar = 'B';
+                break;
+              case queen:
+                figureTypeChar = 'Q';
+                break;
+              case king:
+                figureTypeChar = 'K';
+                break;
+              case pawn:
+                figureTypeChar = 'P';
+                break;
+            }
+            if (currentFigure.isWhite){
+              colorChar = 'w';
+            } else {
+              colorChar = 'b';
+            }
 
             if (startX == (ChessPositions.allAnswers.get(indOfPosition).charAt(2) - 1 - 48)
                     && startY == (ChessPositions.allAnswers.get(indOfPosition).charAt(3) - 1 - 48)
                     && finishX == (ChessPositions.allAnswers.get(indOfPosition).charAt(4) - 1 - 48)
                     && finishY == (ChessPositions.allAnswers.get(indOfPosition).charAt(5) - 1 - 48)
-                    && (currentFigure.type.equals("knight")
-                    && Character.toString(currentFigure.type.charAt(1)).equals
-                    (Character.toString(ChessPositions.allAnswers.get(indOfPosition).charAt(1)).toLowerCase())
-                    || !(currentFigure.type.equals("knight")) && Character.toString(currentFigure.type.charAt(0)).equals
-                    (Character.toString(ChessPositions.allAnswers.get(indOfPosition).charAt(1)).toLowerCase()))
-                    && currentFigure.color == ChessPositions.allAnswers.get(indOfPosition).charAt(0)) {
+                    && figureTypeChar == ChessPositions.allAnswers.get(indOfPosition).charAt(1)
+                    && colorChar == ChessPositions.allAnswers.get(indOfPosition).charAt(0)) {
 
               //right move
               isPrintingCircles = false;
               refreshNumberOfAttempt(true);
-              //Log.d(TAG, "current position after right move = " + desk.currentChessPositionAfterMove() + whoseTurnToPlay);
-              lockScreenApp.saveInfo("currentChessPositionAfterMove", desk.currentChessPositionAfterMove() + whoseTurnToPlay);
+              //Log.d(TAG, "current position after right move = " + board.currentChessPositionAfterMove() + whoseTurnToPlay);
+              lockScreenApp.saveInfo("currentChessPositionAfterMove", board.currentChessPositionAfterMove() + whoseTurnToPlay);
               //Log.d(TAG,"we solved level " + indOfPosition);
               //Log.d(TAG,"ChessPositions.allStartPositions.size() = " + ChessPositions.allStartPositions.size());
               ChessPositions.removeSolvedPositionFromUnsolvedPositions(indOfPosition, lockScreenApp);
@@ -977,8 +993,8 @@ public class ChessView extends View {
               isWorkingWithHandler = true;//**
               isPrintingCircles = false;
               refreshNumberOfAttempt(false);
-              lockScreenApp.saveInfo("currentChessPositionAfterMove", desk.currentChessPositionAfterMove() + whoseTurnToPlay);
-              //Log.d(TAG, "current position after wrong move = " + desk.currentChessPositionAfterMove()+whoseTurnToPlay);
+              lockScreenApp.saveInfo("currentChessPositionAfterMove", board.currentChessPositionAfterMove() + whoseTurnToPlay);
+              //Log.d(TAG, "current position after wrong move = " + board.currentChessPositionAfterMove()+whoseTurnToPlay);
               numberOfSuccessfulAttempt = lockScreenApp.loadInfo("numberOfSuccessfulAttempt");
 
               Log.d(TAG, "   !!!    wrong move");
@@ -1025,7 +1041,7 @@ public class ChessView extends View {
 
 
   protected void afterDialogPawn() {
-    desk.deskAndFiguresAfterPawnBecomesAnotherItem(this, chosenItem, currentItemIndex);
+    board.deskAndFiguresAfterPawnBecomesAnotherItem(this, chosenItem, currentItemIndex);
 
   }
 
@@ -1054,22 +1070,22 @@ public class ChessView extends View {
 
       if (isWorkingWithHandler) {
         isWorkingWithHandler = false;
-        int kingInd = desk.findKingIndex();
+        int kingInd = board.findKingIndex();
         int oldX;
         int oldY;
         int[] safetyMove;
 
-        if (desk.isCheck(kingInd, desk.allFigures[kingInd].color)) {
-          oldX = desk.allFigures[kingInd].positionX;
-          oldY = desk.allFigures[kingInd].positionY;
-          safetyMove = desk.findSafetyMove(kingInd, desk.allFigures[kingInd].color);
+        if (board.isCheck(kingInd, board.allFigures[kingInd].isWhite)) {
+          oldX = board.allFigures[kingInd].posX;
+          oldY = board.allFigures[kingInd].posY;
+          safetyMove = board.findSafetyMove(kingInd, board.allFigures[kingInd].isWhite);
           lockScreenApp.handler.sendMessageDelayed(lockScreenApp.handler.obtainMessage(kingInd, safetyMove[0], safetyMove[1]), 1000);
           lockScreenApp.handler.sendMessageDelayed(lockScreenApp.handler.obtainMessage(kingInd, oldX, oldY), 2000);
         } else {
-          safetyMove = desk.findArbitrarySafetyMove(desk.allFigures[kingInd].color);
+          safetyMove = board.findArbitrarySafetyMove(board.allFigures[kingInd].isWhite);
           if (safetyMove != null) {
-            oldX = desk.allFigures[safetyMove[2]].positionX;
-            oldY = desk.allFigures[safetyMove[2]].positionY;
+            oldX = board.allFigures[safetyMove[2]].posX;
+            oldY = board.allFigures[safetyMove[2]].posY;
             //Log.d(TAG,"oldX = "+oldX+" oldY = "+oldY);
             lockScreenApp.handler.sendMessageDelayed(lockScreenApp.handler.obtainMessage(safetyMove[2], safetyMove[0], safetyMove[1]), 1000); //1 - item index , 2 - xCoor, 3 - yCoor
             lockScreenApp.handler.sendMessageDelayed(lockScreenApp.handler.obtainMessage(safetyMove[2], oldX, oldY), 2000);

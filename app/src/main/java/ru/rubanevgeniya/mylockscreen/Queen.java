@@ -2,55 +2,47 @@ package ru.rubanevgeniya.mylockscreen;
 
 
 public class Queen extends Figure {
-    private boolean isContinue = true;
 
-    public Queen(char color, int positionX, int positionY, String image, String type) {
-        super(color, positionX, positionY, image, type);
-    }
+  public Queen(boolean isWhite, int posX, int posY, String image, Type type) {
+    super(isWhite, posX, posY, image, type);
+  }
 
-    @Override
-    void findPossibleMove(Figure[][] figureOnDesk){
-        possibleMoveX.clear();
-        possibleMoveY.clear();
-        //System.out.println("finding possible move for queen");
-        char enemyColor;
-        if(color == 'w'){
-            enemyColor = 'b';
-        } else {
-            enemyColor = 'w';
+  @Override
+  void findPossibleMove(Figure[][] figureOnBoard) {
+    possibleMove.clear();
+    addPosition(figureOnBoard, 1, 1, 1, 1);
+    addPosition(figureOnBoard, 1, 1, -1, -1);
+    addPosition(figureOnBoard, 1, 1, -1, 1);
+    addPosition(figureOnBoard, 1, 1, 1, -1);
+    addPosition(figureOnBoard, 1, 0, 1, 0);
+    addPosition(figureOnBoard, 0, 1, 0, 1);
+    addPosition(figureOnBoard, 1, 0, -1, 0);
+    addPosition(figureOnBoard, 0, 1, 0, -1);
+  }
+
+  private void addPosition(Figure[][] figureOnBoard, int kX, int kY, int signX, int signY) {
+    Pos pos;
+    boolean isContinue = true;
+
+    while (isContinue) {
+      if ((posY + kY * signY < 8) && (posY + kY * signY > -1) && (posX + kX * signX < 8) && (posX + kX * signX > -1)
+              && (figureOnBoard[posX + kX * signX][posY + kY * signY] == null)) {
+        pos = new Pos(posX + kX * signX, posY + kY * signY);
+        possibleMove.add(pos);
+      } else {
+        isContinue = false;
+        if ((posY + kY * signY < 8) && (posY + kY * signY > -1) && (posX + kX * signX < 8) && (posX + kX * signX > -1)
+                && figureOnBoard[posX + kX * signX][posY + kY * signY] != null
+                && figureOnBoard[posX + kX * signX][posY + kY * signY].isWhite == !isWhite
+          //&&(!figureOnBoard[posX+kX*signX][posY+kY*signY].type.equals("king"))
+                ) {
+          pos = new Pos(posX + kX * signX, posY + kY * signY);
+          possibleMove.add(pos);
         }
-        addPosition(figureOnDesk,1,1,1,1,enemyColor);
-        addPosition(figureOnDesk,1,1,-1,-1, enemyColor);
-        addPosition(figureOnDesk,1,1,-1,1, enemyColor);
-        addPosition(figureOnDesk,1,1,1,-1, enemyColor);
-        addPosition(figureOnDesk,1,0,1,0, enemyColor);
-        addPosition(figureOnDesk,0,1,0,1, enemyColor);
-        addPosition(figureOnDesk,1,0,-1,0, enemyColor);
-        addPosition(figureOnDesk,0,1,0,-1, enemyColor);
+      }
+      kX++;
+      kY++;
     }
-
-    private void addPosition(Figure[][] figureOnDesk,int kX, int kY, int signX, int signY, char color){
-        isContinue = true;
-        while (isContinue){
-            if((positionY+kY*signY < 8) && (positionY+kY*signY > -1) && (positionX+kX*signX < 8)
-                    && (positionX+kX*signX > -1)
-                    &&(figureOnDesk[positionX+kX*signX][positionY+kY*signY] == null)){
-                possibleMoveY.add(positionY+kY*signY);
-                possibleMoveX.add(positionX+kX*signX);
-            } else {
-                isContinue = false;
-                if((positionY+kY*signY < 8) && (positionY+kY*signY > -1) && (positionX+kX*signX < 8)
-                        && (positionX+kX*signX > -1)
-                        && figureOnDesk[positionX+kX*signX][positionY+kY*signY].color == color
-                        //&&(!figureOnDesk[positionX+kX*signX][positionY+kY*signY].type.equals("king"))
-                        ){
-                    possibleMoveY.add(positionY+kY*signY);
-                    possibleMoveX.add(positionX+kX*signX);
-                }
-            }
-            kX++;
-            kY++;
-        }
-    }
+  }
 
 }

@@ -48,7 +48,7 @@ public class BoardViewLand extends View {
 
   @Override
   protected void onDraw(Canvas canvas) {
-    printDesk(canvas);
+    printBoard(canvas);
     printUnlock(canvas);
   }
 
@@ -109,7 +109,7 @@ public class BoardViewLand extends View {
   }
 
 
-  private void printDesk(Canvas canvas) {
+  private void printBoard(Canvas canvas) {
     sideSize = Math.min(canvas.getWidth(), canvas.getHeight());
     buttonsSize = (int) (sideSize / 6.8f);
     DELTA = (int) (sideSize / (67.5));

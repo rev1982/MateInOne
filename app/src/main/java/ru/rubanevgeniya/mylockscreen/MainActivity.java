@@ -13,15 +13,8 @@ public class MainActivity extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     startService(new Intent(this, MyService2.class));
-
-    // start LockScreenApp
-//        Intent intent1 = new Intent(this,LockScreenApp.class);
-//        intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(intent1);
-
     finish();
-
-    Log.d(TAG, " point 1 ");
+    Log.d(TAG, " point 1: Start Service, finish MainActivity");
   }
 
 

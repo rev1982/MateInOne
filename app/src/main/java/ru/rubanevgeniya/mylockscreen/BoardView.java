@@ -46,7 +46,7 @@ public class BoardView extends View {
 
   @Override
   protected void onDraw(Canvas canvas) {
-    printDesk(canvas);
+    printBoard(canvas);
     printUnlock(canvas);
   }
 
@@ -102,7 +102,7 @@ public class BoardView extends View {
   }
 
 
-  private void printDesk(Canvas canvas) {
+  private void printBoard(Canvas canvas) {
 
     sideSize = Math.min(canvas.getWidth(), canvas.getHeight());
     buttonsSize = (int) (sideSize / 6.8f);//7

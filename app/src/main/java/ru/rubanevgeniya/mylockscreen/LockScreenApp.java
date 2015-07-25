@@ -32,7 +32,7 @@ public class LockScreenApp extends PhoenixActivity {
   protected BoardViewLand boardViewLand;
   protected boolean isLockScreen;
   private String toUnlock;
-  private static String TAG = "Log = ";
+  private static String TAG = "Logs LockScreenApp = ";
   protected Handler handler;
   private String isLockedString;
 
@@ -66,27 +66,6 @@ public class LockScreenApp extends PhoenixActivity {
     } else {
       Log.d(TAG, "   need to lock ??????????????????");
     }
-
-
-//        if (getIntent().getAction() == null || LockScreenReceiver.needToStartLock) {
-//            if (LockScreenReceiver.needToStartLock){
-//                LockScreenReceiver.needToStartLock = false;
-//            }
-//            isLockScreen = true;
-//            saveInfoForOuter("isLocked","yes");
-//            //LockScreenReceiver.needToStartLock = false;
-//            LockScreenReceiver.needToAlive = true;
-//            Log.d(TAG,"lock screen !!!");
-//        }
-//
-//        if (getIntent().getFlags() == 3333){  // intent from setting activity when it is not lock screen
-//            isLockScreen = false;
-//            saveInfoForOuter("isLocked","no");
-//            LockScreenReceiver.needToAlive = false;
-//            Log.d(TAG,"not lock screen !!!");
-//        }
-//        Log.d(TAG, "getIntent().getAction() =  " + getIntent().getAction());//turn on -> null, start by myself -> android.intent.action.MAIN
-
 
     try {
       // initialize receiver
@@ -133,30 +112,26 @@ public class LockScreenApp extends PhoenixActivity {
     return load.getString(key, null);
   }
 
-  protected void startSecondActivity() {
-//        Intent intent = new Intent(this,SecondActivity.class);
-//        if (!isLockScreen) {
-//            intent.setFlags(1);
-//        }
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(intent);
+//  protected void startSecondActivity() {
+//    LockScreenReceiver.startSecondActivity = true;
 
 
-    //LockScreenReceiver.secondActivityNeedToCreate = true;
-    AlarmManager alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-    Intent intent2 = new Intent(this, LockScreenReceiver.class);
 
-    // TODO: extract a constant with a self-describing name
-    intent2.setFlags(5555);
-    intent2.putExtra("code", 5555);
-    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent2,
-            PendingIntent.FLAG_CANCEL_CURRENT);
-    alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 500, pendingIntent);
-    Log.d(TAG, " creating pending intent SecondActivity ");
+//    AlarmManager alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//    Intent intent2 = new Intent(this, LockScreenReceiver.class);
+//
+//    // TODO: extract a constant with a self-describing name
+//    intent2.setFlags(5555);
+//    intent2.putExtra("code", 5555);
+//    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent2,
+//            PendingIntent.FLAG_CANCEL_CURRENT);
+//    alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 500, pendingIntent);
+
+    //Log.d(TAG, " creating pending intent SecondActivity ");
 
 
-    finish();
-  }
+//    finish();
+//  }
 
 
   @Override

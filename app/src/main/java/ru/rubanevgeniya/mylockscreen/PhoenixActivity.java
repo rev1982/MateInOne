@@ -41,6 +41,12 @@ public class PhoenixActivity extends Activity {
                     PendingIntent.FLAG_CANCEL_CURRENT);
 
             alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5000, pendingIntent);
+        } else if (!LockScreenReceiver.needToAlive && LockScreenReceiver.startSecondActivity){
+            Intent intent = new Intent(this,SecondActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            Log.d(TAG, " creating intent SecondActivity ");
+            LockScreenReceiver.startSecondActivity = false;
         }
     }
 

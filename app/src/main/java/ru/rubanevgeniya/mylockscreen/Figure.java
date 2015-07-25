@@ -4,30 +4,25 @@ package ru.rubanevgeniya.mylockscreen;
 import java.util.ArrayList;
 
 public abstract class Figure {
-  enum Type {pawn, king, bishop}; // TODO: finish this enum
+  protected enum Type {pawn, king, bishop, queen, knight, rook}
   protected String image;
-  protected int positionX; // TODO: change to Pos pos; or posX, posY;
-  protected int positionY;
-  protected char color; // TODO: make it boolean??? and rename to isWhite; opposite color would be !isWhite
-  protected String type; // TODO: change String to a new enum Type and do not compare types with Strings.equal()
-
-  // TODO: introduce a class Pos {int x; int y;} and replace all parallel use of X and Y with one Pos
-  // TODO: this protected ArrayList<Pos> possibleMoves;
-  protected ArrayList<Integer> possibleMoveX;
-  protected ArrayList<Integer> possibleMoveY;
+  protected int posX;
+  protected int posY;
+  protected boolean isWhite;
+  protected Type type;
+  protected ArrayList<Pos> possibleMove;
   protected boolean wasMoved = false;
 
-  public Figure(char color, int positionX, int positionY, String image, String type) {
-    this.color = color;
-    this.positionX = positionX;
-    this.positionY = positionY;
+  public Figure(boolean isWhite, int posX, int posY, String image, Type type) {
+    this.isWhite = isWhite;
+    this.posX = posX;
+    this.posY = posY;
     this.image = image;
     this.type = type;
-    possibleMoveX = new ArrayList<>();
-    possibleMoveY = new ArrayList<>();
+    possibleMove = new ArrayList<>();
   }
 
-  void findPossibleMove(Figure[][] figureOnDesk) {
+  void findPossibleMove(Figure[][] figureOnBoard) {
 
   }
 
