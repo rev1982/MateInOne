@@ -21,8 +21,8 @@ import android.widget.Toast;
 
 public class SecondActivity extends PhoenixActivity {
   private static final String TAG = "Logs SecondActivity : ";
-  private String isLockedString;
-  private String CODE;
+  private boolean isLocked;
+  private long CODE;
   private TextView textView;
   private TextView textView0;
   private static final Object monitor = new Object();
@@ -33,20 +33,16 @@ public class SecondActivity extends PhoenixActivity {
 
     super.onCreate(savedInstanceState);
     boolean isPortrait = false;
-    isLockedString = LockScreenReceiver.loadOuterInfo("isLocked", this);
+    isLocked = LockScreenReceiver.loadOuterInfoBoolean("isLocked2", this);
     if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
       isPortrait = true;
     }
 
     MyPhoneStateListener.secondActivity = this;
     LockScreenReceiver.secondActivity = this;
-    if (isLockedString != null && isLockedString.equals("yes")) {
-      LockScreenReceiver.needToAlive = true;
-    } else if (isLockedString != null && isLockedString.equals("no")) {
-      LockScreenReceiver.needToAlive = false;
-    }
-    Log.d(TAG, " SecondActivity onCreate ,   LockScreenReceiver.needToAlive = " + LockScreenReceiver.needToAlive + " isLockedString = " + isLockedString);
-    CODE = LockScreenReceiver.loadOuterInfo("code",this);
+    LockScreenReceiver.needToAlive = isLocked;
+    Log.d(TAG, " SecondActivity onCreate ,   LockScreenReceiver.needToAlive = " + LockScreenReceiver.needToAlive + " isLocked = " + isLocked);
+    CODE = LockScreenReceiver.loadOuterInfoLong("code2", this);
     Log.d(TAG, "loaded code = " + CODE);
 
     RadioGroup.LayoutParams layoutParams =
@@ -265,11 +261,8 @@ public class SecondActivity extends PhoenixActivity {
 
   private void checkCode(String text) {
     Log.d(TAG, "check code :  getIntent().getFlags() = " + getIntent().getFlags());
-    if (CODE == null
-            || text.equals(CODE)
-            || (isLockedString != null && isLockedString.equals("no"))
-            ) {
-      LockScreenReceiver.saveInfoForOuter("isLocked", "no", this);
+    if (CODE == -1000 || Long.parseLong(text)== CODE || !isLocked) {
+      LockScreenReceiver.saveInfoForOuterBoolean("isLocked2", false, this);
       LockScreenReceiver.needToAlive = false;
       this.finish();
     } else {
@@ -279,11 +272,9 @@ public class SecondActivity extends PhoenixActivity {
   }
 
   private void checkCodeToStartSettings(String text) {
-    CODE = LockScreenReceiver.loadOuterInfo("code",this);
+    CODE = LockScreenReceiver.loadOuterInfoLong("code2", this);
     Log.d(TAG, "loaded code = " + CODE);
-    if (CODE == null
-            || text.equals(CODE)
-            ) {
+    if (CODE == -1000 || Long.parseLong(text) == CODE) {
       Intent intent = new Intent(this, SettingsActivity.class);
       intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       startActivity(intent);
@@ -305,7 +296,7 @@ public class SecondActivity extends PhoenixActivity {
 
   @Override
   public void onBackPressed() {
-    if (isLockedString != null && isLockedString.equals("yes")) {
+    if (isLocked) {
       Toast toast = Toast.makeText(this, getResources().getString(R.string.toUnlockEnter), Toast.LENGTH_LONG);
       toast.show();
     } else {

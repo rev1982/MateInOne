@@ -35,11 +35,11 @@ public class ChessView extends View {
   private boolean isRightMove;
   private boolean isWrongMove;
   private boolean isItemMoving;
-  private String amountOfLevelsToSolve;
+  private int amountOfLevelsToSolve;
   private ColorFilter colorFilter;
   private boolean isPlayingWhite;
   private char whoseTurnToPlay;
-  private Paint paintDackCircles = new Paint();
+  private Paint paintDarkCircles = new Paint();
   private Paint paintLightCircles = new Paint();
   private Paint paint4fSize = new Paint();
   private Paint paint2fSize = new Paint();
@@ -58,12 +58,11 @@ public class ChessView extends View {
   private int indOfPosition;
   private Board board;
   private boolean isInitialChessPositionReady;
-  private final float[] coordinatesInDeskSellsFloatX = new float[8];
-  private final float[] coordinatesInDeskSellsFloatY = new float[8];
+  private final static float[] coorInDeskCellsFloatX = new float[8];
+  private final static float[] coorInDeskCellsFloatY = new float[8];
   private int buttonsSize;
-  private float[] movingCoordinatesX;
-  private float[] movingCoordinatesY;
-  private int currentItemIndex = 0;
+  private Coordinate[] movingCoordinates;
+  private int itemInd = 0;
   private ArrayList<Pos> possibleCoordinates = new ArrayList<>();
   private boolean drag = false;
   private float dragX = 0;
@@ -72,8 +71,8 @@ public class ChessView extends View {
   private DateFormat dateFormat1 = new SimpleDateFormat("dd/MM/yyyy");
   private DateFormat dateFormat2 = new SimpleDateFormat("hh:mm");
   protected Timer timer = new Timer();
-  private String isIlluminatingCells;
-  private String numberOfPossibleResolvingAttempts;
+  private boolean isIlluminatingCells;
+  private int numberOfPossibleResolvingAttempts;
   private String numberOfAlreadyResolved;
   private Rect clipBound = new Rect();
   private Rect rect = new Rect();
@@ -96,12 +95,11 @@ public class ChessView extends View {
   private Figure currentFigure;
   protected Figure.Type chosenItem;
   protected boolean isNewItemChosen = false;
-  private DialogPawn dialogPawn;
   protected boolean isNewDeskReady = false;
   private boolean isDrawingResolving;
   protected MyTimerTask myTimerTask;
-  private float xAnswerCenter;
-  private float yAnswerCenter;
+  //private float xAnswerCenter;
+  //private float yAnswerCenter;
   private float xDateCenter;
   private float yDateCenter;
   private float xTimeCenter;
@@ -110,12 +108,11 @@ public class ChessView extends View {
   private boolean isEverythingSolved;
   private boolean isSecondTouch;
   private int indOfPossibleMoveSecondTouch;
-  private boolean isPrintingCircles;
+  private boolean isDrawingCircles;
 
   private String text1;
   private String text2;
   private String text3;
-  private String blackOrWhiteToMove;
   private String text22;
   private String levels1;
   private String level;
@@ -137,17 +134,16 @@ public class ChessView extends View {
   private int refreshHeight;
   private int refreshWidth;
   private Typeface typeface;
-  private String forward = "\uF061";
-  private String refresh = "\uF021";
+  private static final String forward = "\uF061";
+  private static final String refresh = "\uF021";
   float xInfoLeft;
   float yInfoTop;
-  private  boolean isWhiteTurnToPlay;
+  private boolean isWhiteTurnToPlay;
 
 
   public ChessView(Context context, AttributeSet attrs) {
     super(context, attrs);
     lockScreenApp = (LockScreenApp) getContext();
-
     isInitialChessPositionReady = false;
     Board.figureOnDesk = new Figure[8][8];
     ChessPositions.createInitialChessPosition();
@@ -162,9 +158,9 @@ public class ChessView extends View {
     ColorMatrix colorMatrix = new ColorMatrix(cmData);
     colorFilter = new ColorMatrixColorFilter(colorMatrix);
 
-    numberOfPossibleResolvingAttempts = lockScreenApp.loadOuterInfo("amountOfAttemptsToResolve");
-    isIlluminatingCells = lockScreenApp.loadOuterInfo("isIlluminating");
-    amountOfLevelsToSolve = lockScreenApp.loadOuterInfo("amountOfLevelsToSolve");
+    numberOfPossibleResolvingAttempts = LockScreenReceiver.loadOuterInfoInt("amountOfAttemptsToResolve3", getContext());
+    isIlluminatingCells = !LockScreenReceiver.loadOuterInfoBoolean("isNoIlluminating",getContext());
+    amountOfLevelsToSolve = LockScreenReceiver.loadOuterInfoInt("amountOfLevelsToSolve3", getContext());
     numberOfAlreadyResolved = lockScreenApp.loadInfo("alreadyResolved");
     numberOfAttempt = lockScreenApp.loadInfo("numberOfAttempt");
     numberOfSuccessfulAttempt = lockScreenApp.loadInfo("numberOfSuccessfulAttempt");
@@ -172,54 +168,54 @@ public class ChessView extends View {
 
     fontPaintLettersNumbers.setTextAlign(Paint.Align.CENTER);
     fontPaintLettersNumbers.setColor(Color.BLACK);
-    paintDackCircles.setAlpha(100);
+    paintDarkCircles.setAlpha(100);
     paintLightCircles.setColor(getResources().getColor(R.color.mybg2));
-    paintDackCircles.setColor(getResources().getColor(R.color.mybg4));
+    paintDarkCircles.setColor(getResources().getColor(R.color.mybg4));
     typeface = Typeface.createFromAsset(getContext().getAssets(), "fonts/fontawesome.woff");
+    paint.setAlpha(150);
   }
 
 
   @Override
   protected void onDraw(Canvas canvas) {
     //Log.d(TAG,"onDraw +++");
-    // TODO: change printZZZ mathod names to drawZZZ
     if (!isInitialChessPositionReady) {
       findStartPosition(canvas);
     } else {
       canvas.getClipBounds(clipBound);
     }
-    printLettersAndNumbers(canvas);
-    printDateAndTime(canvas);
-    printChessPosition(canvas, startPosition);
+    drawLettersAndNumbers(canvas);
+    drawDateAndTime(canvas);
+    drawChessPosition(canvas);
     if (isRightMove) {
-      printAfterMove(canvas, true);
+      drawAfterMove(canvas, true);
     } else if (isWrongMove) {
-      printAfterMove(canvas, false);
+      drawAfterMove(canvas, false);
     }
   }
 
 
-  private void findCoordinatesInSells() {
+  private void findCoordinatesInCells() {
     for (int i = 0; i < 8; i++) {
       int i1 = i - 8 * (i / 8);
       if (isPlayingWhite) {
-        coordinatesInDeskSellsFloatX[i] = sideSize / DELTA / 2 + squareSize / 2 + squareSize * (i1);
-        coordinatesInDeskSellsFloatY[7 - i] = sideSize / DELTA / 2 + squareSize * (i) + squareSize / 2 + squareSize / (3.1f) + squareSize / 12;
+        coorInDeskCellsFloatX[i] = sideSize / DELTA / 2 + squareSize / 2 + squareSize * (i1);
+        coorInDeskCellsFloatY[7 - i] = sideSize / DELTA / 2 + squareSize * (i) + squareSize / 2 + squareSize / (3.1f) + squareSize / 12;
       } else {
-        coordinatesInDeskSellsFloatY[i] = sideSize / DELTA / 2 + squareSize * (i) + squareSize / 2 + squareSize / (3.1f) + squareSize / 12;
-        coordinatesInDeskSellsFloatX[7 - i] = sideSize / DELTA / 2 + squareSize / 2 + squareSize * (i1);
+        coorInDeskCellsFloatY[i] = sideSize / DELTA / 2 + squareSize * (i) + squareSize / 2 + squareSize / (3.1f) + squareSize / 12;
+        coorInDeskCellsFloatX[7 - i] = sideSize / DELTA / 2 + squareSize / 2 + squareSize * (i1);
       }
     }
   }
 
 
-  private void printDateAndTime(Canvas canvas) {
+  private void drawDateAndTime(Canvas canvas) {
     canvas.drawText(dateFormat2.format(Calendar.getInstance().getTime()), xTimeCenter, yTimeCenter, paint4fSize);
     canvas.drawText(dateFormat1.format(Calendar.getInstance().getTime()), xDateCenter, yDateCenter, paint1dot5fSize);
   }
 
 
-  private void printBitmapWithColorFilter(Canvas canvas, Bitmap bitmap, float left, float top, float right, float bottom) {
+  private void drawBitmapWithColorFilter(Canvas canvas, Bitmap bitmap, float left, float top, float right, float bottom) {
     rectBitmap.top = (int) (top);
     rectBitmap.left = (int) left;
     rectBitmap.right = (int) right;
@@ -233,21 +229,16 @@ public class ChessView extends View {
   }
 
 
-  private void printBitmap(Canvas canvas, Bitmap bitmap, float left, float top, float right, float bottom, Integer alpha) {
+  private void drawBitmap(Canvas canvas, Bitmap bitmap, float left, float top, float right, float bottom) {
     rectBitmap.top = (int) (top);
     rectBitmap.left = (int) left;
     rectBitmap.right = (int) right;
     rectBitmap.bottom = (int) bottom;
-
     rect.top = 0;
     rect.left = 0;
     rect.right = bitmap.getWidth();
     rect.bottom = bitmap.getHeight();
-    if (alpha > 0) {
-      paint.setAlpha(alpha);
-    }
     canvas.drawBitmap(bitmap, rect, rectBitmap, paint);
-    paint.setAlpha(255);
   }
 
 
@@ -281,23 +272,24 @@ public class ChessView extends View {
   }
 
 
-  private void printLettersAndNumbers(Canvas canvas) {
+  private void drawLettersAndNumbers(Canvas canvas) {
+    String num;
     for (int i = 0; i < 8; i++) {
-      canvas.drawText(LETTERS[i], coordinatesInDeskSellsFloatX[i], sideSize / DELTA / (2.5f), fontPaintLettersNumbers);
-      canvas.drawText(LETTERS[i], coordinatesInDeskSellsFloatX[i], sideSize - sideSize / DELTA / (10f), fontPaintLettersNumbers);
-      canvas.drawText(Integer.toString(i + 1), sideSize / DELTA / 5, coordinatesInDeskSellsFloatY[i] - squareSize / 3, fontPaintLettersNumbers);
-      canvas.drawText(Integer.toString(i + 1), sideSize - sideSize / DELTA / 3.5f, coordinatesInDeskSellsFloatY[i] - squareSize / 3, fontPaintLettersNumbers);
+      num = Integer.toString(i + 1);
+      canvas.drawText(LETTERS[i], coorInDeskCellsFloatX[i], sideSize / DELTA / (2.5f), fontPaintLettersNumbers);
+      canvas.drawText(LETTERS[i], coorInDeskCellsFloatX[i], sideSize - sideSize / DELTA / (10f), fontPaintLettersNumbers);
+      canvas.drawText(num, sideSize / DELTA / 5, coorInDeskCellsFloatY[i] - squareSize / 3, fontPaintLettersNumbers);
+      canvas.drawText(num, sideSize - sideSize / DELTA / 3.5f, coorInDeskCellsFloatY[i] - squareSize / 3, fontPaintLettersNumbers);
     }
   }
 
 
   private void findStartPosition(Canvas canvas) {
-
     sideSize = Math.min(canvas.getHeight(), canvas.getWidth());
     if (canvas.getHeight() > canvas.getWidth()) {
       isPortrait = true;
     }
-    buttonsSize = (int) (sideSize / 6.8f);//7
+    buttonsSize = (int) (sideSize / 6.8f);
     DELTA = (int) (sideSize / (67.5));
     squareSize = (sideSize - sideSize / DELTA) / 8;
     fontSize = (int) (sideSize / 36);
@@ -305,8 +297,8 @@ public class ChessView extends View {
     if (isPortrait) {
       xUnlockCenter = sideSize / 25 + buttonsSize / 2;
       yUnlockCenter = sideSize + sideSize / 4 + buttonsSize / 2;
-      xAnswerCenter = sideSize - sideSize / 4;
-      yAnswerCenter = sideSize + sideSize / 20;
+      //xAnswerCenter = sideSize - sideSize / 4;
+      //yAnswerCenter = sideSize + sideSize / 20;
       xTimeCenter = sideSize / 2 + sideSize / (3.2f);
       yTimeCenter = sideSize + sideSize / 4 + sideSize / 20 + sideSize / 30 - sideSize / 40;
       xDateCenter = xTimeCenter;
@@ -315,8 +307,8 @@ public class ChessView extends View {
     } else {
       xUnlockCenter = sideSize / 20 + buttonsSize / 2 + sideSize;
       yUnlockCenter = sideSize / 2 + sideSize / 4 + buttonsSize / 2;
-      xAnswerCenter = sideSize + sideSize / 4;
-      yAnswerCenter = sideSize / 20;
+      //xAnswerCenter = sideSize + sideSize / 4;
+      //yAnswerCenter = sideSize / 20;
       xTimeCenter = sideSize + sideSize / (3f);
       yTimeCenter = sideSize / 2 + sideSize / 15 + sideSize / 20;
       xDateCenter = xTimeCenter;
@@ -336,7 +328,6 @@ public class ChessView extends View {
     iconPaint.setTextSize(iconSize);
     forwardHeight = iconHeight;
     forwardWidth = iconWidth;
-    //iconSize = findFontSizeForIcon(refresh);
     refreshHeight = iconHeight;
     refreshWidth = iconWidth;
 
@@ -377,7 +368,6 @@ public class ChessView extends View {
     levels3 = getResources().getString(R.string.levels3);
     toUnlockSolve0 = getResources().getString(R.string.toUnlockSolve0);
 
-
     String loadedIndOfPosition = lockScreenApp.loadInfo("indOfPosition");
     if (loadedIndOfPosition != null) {
       indOfPosition = Integer.parseInt(loadedIndOfPosition);
@@ -389,7 +379,6 @@ public class ChessView extends View {
       indOfPosition = 0;
       Log.d(TAG, "troubles with indOfPosition, let it be = " + indOfPosition);
     }
-
 
     //begin check if it was screen rotation after move
     String currentChessPositionAfterMove = lockScreenApp.loadInfo("currentChessPositionAfterMove");
@@ -427,14 +416,15 @@ public class ChessView extends View {
       isWhiteTurnToPlay = true;
     }
 
-    findCoordinatesInSells();
+    findCoordinatesInCells();
     fontPaint.setTextSize(4 * fontSize);
   }
 
 
-  private void printChessPosition(Canvas canvas, String startPosition) { // TDOD: startPosition argument is not needed, it is a field
+  private void drawChessPosition(Canvas canvas) {
 
     if (!isInitialChessPositionReady) {
+      Coordinate coordinate;
       lockScreenApp.handler.removeCallbacksAndMessages(null);
 
       fontPaint.setTextSize(4 * fontSize);
@@ -444,75 +434,69 @@ public class ChessView extends View {
 
       board = new Board(startPosition);
       board.createStartPosition();
-      int fontSizeForChess = findFontSizeForChess();//!!!!!!!!!!!!!!!!
-      //Log.d(TAG,"fontSizeForChess = " + fontSizeForChess);
+      int fontSizeForChess = findFontSizeForChess();
       isInitialChessPositionReady = true;
-      movingCoordinatesX = new float[board.allFigures.length];
-      movingCoordinatesY = new float[board.allFigures.length];
+      movingCoordinates = new Coordinate[board.allFigures.length];
       for (int i = 0; i < board.allFigures.length; i++) {
-        movingCoordinatesX[i] = coordinatesInDeskSellsFloatX[board.allFigures[i].posX];
-        movingCoordinatesY[i] = coordinatesInDeskSellsFloatY[board.allFigures[i].posY];
+        coordinate = new Coordinate(coorInDeskCellsFloatX[board.allFigures[i].posX],
+                coorInDeskCellsFloatY[board.allFigures[i].posY]);
+        movingCoordinates[i] = coordinate;
         if (board.allFigures[i].isWhite) {
           fontPaint.setColor(Color.WHITE);
         } else {
           fontPaint.setColor(Color.BLACK);
         }
-        fontPaint.setTextSize(fontSizeForChess);//120!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        fontPaint.setTextSize(fontSizeForChess);
         Log.d(TAG, ("start position : " + board.allFigures[i].type + " " +
                 board.allFigures[i].isWhite + " " + board.allFigures[i].posX + " " + board.allFigures[i].posY));
-                canvas.drawText(board.allFigures[i].image, coordinatesInDeskSellsFloatX[board.allFigures[i].posX],
-                        coordinatesInDeskSellsFloatY[board.allFigures[i].posY], fontPaint);
+        canvas.drawText(board.allFigures[i].image, coorInDeskCellsFloatX[board.allFigures[i].posX],
+                coorInDeskCellsFloatY[board.allFigures[i].posY], fontPaint);
       }
       isInitialChessPositionReady = true;
+
     } else {
-
-      if ((isIlluminatingCells == null || isIlluminatingCells.equals("yes")) && isPrintingCircles) { //illuminating cells by default
-        printCircles(canvas);
+      if (isIlluminatingCells && isDrawingCircles) { //illuminating cells by default
+        drawCircles(canvas);
       }
-
       for (int i = 0; i < board.allFigures.length; i++) {
         if (board.allFigures[i] != null
-                && movingCoordinatesX[i] <= clipBound.right
-                && movingCoordinatesX[i] >= clipBound.left
-                && movingCoordinatesY[i] >= clipBound.top
-                && movingCoordinatesY[i] <= clipBound.bottom) {
+                && movingCoordinates[i].x <= clipBound.right
+                && movingCoordinates[i].x >= clipBound.left
+                && movingCoordinates[i].y >= clipBound.top
+                && movingCoordinates[i].y <= clipBound.bottom) {
           if (board.allFigures[i].isWhite) {
             fontPaint.setColor(Color.WHITE);
           } else {
             fontPaint.setColor(Color.BLACK);
           }
-          canvas.drawText(board.allFigures[i].image, movingCoordinatesX[i],
-                  movingCoordinatesY[i], fontPaint);
+          canvas.drawText(board.allFigures[i].image, movingCoordinates[i].x,
+                  movingCoordinates[i].y, fontPaint);
         }
       }
     }
-    //printResults(canvas);
-    printToMoveAndCheckmate(canvas);
+    drawToMoveAndCheckmate(canvas);
   }
 
-  private void printToMoveAndCheckmate(Canvas canvas) {
+  private void drawToMoveAndCheckmate(Canvas canvas) {
+    String blackOrWhiteToMove;
 
-    if (amountOfLevelsToSolve == null) {
-      amountOfLevelsToSolve = "1";
+    if (amountOfLevelsToSolve == 1000) {
+      amountOfLevelsToSolve = 1;
     }
     if (numberOfJustSolvedLevels == null) {
       numberOfJustSolvedLevels = "0";
     }
-
-    if (Integer.parseInt(amountOfLevelsToSolve) - Integer.parseInt(numberOfJustSolvedLevels) == 1) {
+    int leftToSolve = amountOfLevelsToSolve - Integer.parseInt(numberOfJustSolvedLevels);
+    if (leftToSolve == 1) {
       levels1 = level;
-    }
-    if (Integer.parseInt(amountOfLevelsToSolve) - Integer.parseInt(numberOfJustSolvedLevels) == 0) {
+    } else if (leftToSolve == 0 || leftToSolve >= 5) {
       levels1 = levels3;
-    }
-    if (Integer.parseInt(amountOfLevelsToSolve) - Integer.parseInt(numberOfJustSolvedLevels) <= 4 &&
-            Integer.parseInt(amountOfLevelsToSolve) - Integer.parseInt(numberOfJustSolvedLevels) > 1) {
+    } else if (leftToSolve <= 4 && leftToSolve > 1) {
       levels1 = levels;
     }
-    if (Integer.parseInt(amountOfLevelsToSolve) - Integer.parseInt(numberOfJustSolvedLevels) >= 5) {
-      levels1 = levels3;
-    }
-
+// else if (leftToSolve >= 5) {
+//      levels1 = levels3;
+//    }
 
     if (whoseTurnToPlay == 'b') {
       fontPaint.setColor(Color.BLACK);
@@ -525,52 +509,44 @@ public class ChessView extends View {
     }
     if (isPortrait) {
       canvas.drawText("o", sideSize / 11, sideSize + sideSize / 8 - sideSize / 30, fontPaint); //pawn
-      canvas.drawText(blackOrWhiteToMove + " " + text22, sideSize / 2 + sideSize / 20, sideSize + sideSize / 8 - sideSize / 40 - sideSize / 30, paint2fSize);
+      canvas.drawText(blackOrWhiteToMove + " " + text22, sideSize / 2 + sideSize / 20,
+              sideSize + sideSize / 8 - sideSize / 40 - sideSize / 30, paint2fSize);
       if (lockScreenApp.isLockScreen) {
-        canvas.drawText(toUnlockSolve0 + " " + toUnlockSolve + " " + Integer.toString(Integer.parseInt(amountOfLevelsToSolve) - Integer.parseInt(numberOfJustSolvedLevels)) + " " +
+        canvas.drawText(toUnlockSolve0 + " " + toUnlockSolve + " " + Integer.toString(leftToSolve) + " " +
                 levels1, sideSize / 11, sideSize + sideSize / 8 + sideSize / 50, paint1dot3fSize);
         canvas.drawText(rusString + " " + numberOfJustSolvedLevels + " " + solved,
                 sideSize / 11, sideSize + sideSize / 8 + sideSize / 20 + sideSize / 50, paint1dot3fSize);
-
-//                canvas.drawText(toUnlockSolve + " " + amountOfLevelsToSolve + " " +
-//                        levels1, sideSize / 8, sideSize + sideSize / 8 + sideSize/50 , paint1dot3fSize);
-//                canvas.drawText(numberOfJustSolvedLevels + " " + solved + "        "
-//                                +Integer.toString(Integer.parseInt(amountOfLevelsToSolve) - Integer.parseInt(numberOfJustSolvedLevels)) + " to solve ",
-//                        sideSize / 8, sideSize + sideSize / 8 + sideSize / 20 + sideSize/50, paint1dot3fSize);
       }
     } else {
       canvas.drawText("o", sideSize + sideSize / 7, sideSize / 3.2f - sideSize / 7 - sideSize / 20, fontPaint);//pawn
-      canvas.drawText(blackOrWhiteToMove, sideSize + sideSize / 2 - sideSize / 10, sideSize / 4 - sideSize / 7 - sideSize / 25, paint2fSize);
+      canvas.drawText(blackOrWhiteToMove, sideSize + sideSize / 2 - sideSize / 10,
+              sideSize / 4 - sideSize / 7 - sideSize / 25, paint2fSize);
       canvas.drawText(text22, sideSize + sideSize / 2 - sideSize / 10, sideSize / 3 - sideSize / 7 - sideSize / 16, paint2fSize);
       if (lockScreenApp.isLockScreen) {
-//                canvas.drawText(toUnlockSolve + amountOfLevelsToSolve+
-//                        levels1, sideSize + sideSize / 8, sideSize / 7+sideSize/20+sideSize/70, paint1dot3fSize);
         canvas.drawText(toUnlockSolve0, sideSize + sideSize / 9, sideSize / 7 + sideSize / 20 + sideSize / 70, paint1dot3fSize);
-        canvas.drawText(toUnlockSolve + " " + Integer.toString(Integer.parseInt(amountOfLevelsToSolve) - Integer.parseInt(numberOfJustSolvedLevels)) + " " +
+        canvas.drawText(toUnlockSolve + " " + Integer.toString(leftToSolve) + " " +
                 levels1, sideSize + sideSize / 9, sideSize / 7 + 2 * sideSize / 20 + sideSize / 70, paint1dot3fSize);
         canvas.drawText(rusString + " " + numberOfJustSolvedLevels + " " + solved,
                 sideSize + sideSize / 9, sideSize / 7 + 3 * sideSize / 20 + sideSize / 70, paint1dot3fSize);
-//                canvas.drawText(Integer.toString(Integer.parseInt(amountOfLevelsToSolve) - Integer.parseInt(numberOfJustSolvedLevels)) + " to solve",
-//                        sideSize + sideSize / 8, sideSize / 7 + 3*sideSize/20+sideSize/70, paint1dot3fSize);
       }
     }
   }
 
 
-  private void printCircles(Canvas canvas) {
+  private void drawCircles(Canvas canvas) {
     Square square;
     for (int i = 0; i < possibleCoordinates.size(); i++) {
       if (isPlayingWhite) {
         if (isPortrait) {
-          square = BoardView.squareArray[possibleCoordinates.get(i).x][possibleCoordinates.get(i).y];//++
+          square = BoardView.squareArray[possibleCoordinates.get(i).x][possibleCoordinates.get(i).y];
         } else {
-          square = BoardViewLand.squareArray[possibleCoordinates.get(i).x][possibleCoordinates.get(i).y];//++
+          square = BoardViewLand.squareArray[possibleCoordinates.get(i).x][possibleCoordinates.get(i).y];
         }
       } else {
         if (isPortrait) {
-          square = BoardView.squareArray[7 - possibleCoordinates.get(i).x][7 - possibleCoordinates.get(i).y];//++
+          square = BoardView.squareArray[7 - possibleCoordinates.get(i).x][7 - possibleCoordinates.get(i).y];
         } else {
-          square = BoardViewLand.squareArray[7 - possibleCoordinates.get(i).x][7 - possibleCoordinates.get(i).y];//++
+          square = BoardViewLand.squareArray[7 - possibleCoordinates.get(i).x][7 - possibleCoordinates.get(i).y];
         }
       }
       if (square.color == 'b') {
@@ -578,7 +554,7 @@ public class ChessView extends View {
                 (square.bottom + square.top) / 2, squareSize / 4, paintLightCircles);
       } else {
         canvas.drawCircle((square.right + square.left) / 2,
-                (square.bottom + square.top) / 2, squareSize / 4, paintDackCircles);
+                (square.bottom + square.top) / 2, squareSize / 4, paintDarkCircles);
       }
     }
   }
@@ -587,19 +563,18 @@ public class ChessView extends View {
   @Override
   public boolean onTouchEvent(MotionEvent event) {
 
-
     float evX = event.getX();
     float evY = event.getY();
-    if (movingCoordinatesX != null) {
+    if (movingCoordinates != null) {
 
       switch (event.getAction()) {
         case MotionEvent.ACTION_DOWN:
 
-          isPrintingCircles = false;
+          isDrawingCircles = false;
 
           if (isRightMove && lockScreenApp.isLockScreen) {//touching screen after right move and unlocking the screen
             lockScreenApp.saveInfo("alreadyResolved", null);
-            amountOfLevelsToSolve = lockScreenApp.loadOuterInfo("amountOfLevelsToSolve");
+            amountOfLevelsToSolve = LockScreenReceiver.loadOuterInfoInt("amountOfLevelsToSolve3",getContext());
             //Log.d(TAG, "amountOfLevelsToSolve = " + amountOfLevelsToSolve);
 
             lockScreenApp.saveInfo("currentChessPositionAfterMove", null);
@@ -611,26 +586,26 @@ public class ChessView extends View {
               lockScreenApp.saveInfo("numberOfAttempt", null);
             }
 
-            if (amountOfLevelsToSolve == null
-                    || Integer.parseInt(amountOfLevelsToSolve) == 1) {
+            if (amountOfLevelsToSolve == -1000
+                    || amountOfLevelsToSolve == 1) {
               if (timer != null) {
                 timer.cancel();
                 timer = null;
               }
               isEverythingSolved = true;
-              lockScreenApp.saveInfoForOuter("isLocked", "no");
+              LockScreenReceiver.saveInfoForOuterBoolean("isLocked2", false, lockScreenApp);
               myTimerTask = null;
               //Log.d(TAG,"amountOfLevelsToSolve = null or 1");
               LockScreenReceiver.needToAlive = false;
-              lockScreenApp.saveInfoForOuter("time", Long.toString(System.currentTimeMillis()));
+              LockScreenReceiver.saveInfoForOuterLong("time2", System.currentTimeMillis(), getContext());
               //Log.d(TAG, "chessView : lockScreenApp.loadOuterInfo(\"time\") = " + lockScreenApp.loadOuterInfo("time"));
               Board.figureOnDesk = new Figure[8][8];
               lockScreenApp.saveInfo("amountOfJustSolvedLevels", null);//**
               lockScreenApp.finish();
-              possibleCoordinates = null;//**
+              possibleCoordinates = null;
 
             } else {
-              int needToSolve = Integer.parseInt(amountOfLevelsToSolve);
+              int needToSolve = amountOfLevelsToSolve;
               numberOfJustSolvedLevels = lockScreenApp.loadInfo("amountOfJustSolvedLevels");
               if (numberOfJustSolvedLevels == null) {
                 numberOfJustSolvedLevels = "0";
@@ -639,7 +614,7 @@ public class ChessView extends View {
               //Log.d(TAG,"alreadySolved = "+(numberOfJustSolvedLevels));
               if (alreadySolvedInt >= needToSolve) {
                 lockScreenApp.saveInfo("amountOfJustSolvedLevels", null);
-                lockScreenApp.saveInfoForOuter("time", Long.toString(System.currentTimeMillis()));
+                LockScreenReceiver.saveInfoForOuterLong("time2", System.currentTimeMillis(), getContext());
                 if (timer != null) {
                   timer.cancel();
                   timer = null;
@@ -648,19 +623,19 @@ public class ChessView extends View {
                 LockScreenReceiver.needToAlive = false;
                 Board.figureOnDesk = new Figure[8][8];
                 isEverythingSolved = true;
-                lockScreenApp.saveInfoForOuter("isLocked", "no");
+                LockScreenReceiver.saveInfoForOuterBoolean("isLocked2",false,lockScreenApp);
                 lockScreenApp.finish();
-                possibleCoordinates = null;//**
+                possibleCoordinates = null;
               } else {
                 isRightMove = false;
                 isInitialChessPositionReady = false;
-                possibleCoordinates = null;//**
+                possibleCoordinates = null;
                 Board.figureOnDesk = new Figure[8][8];
                 invalidate();
               }
             }
 
-          } else if (isRightMove && !lockScreenApp.isLockScreen) {//touching screen after right move when it is not lockScreen
+          } else if (isRightMove) {//touching screen after right move when it is not lockScreen
             Log.d(TAG, "touching screen after right move when it is not lockScreen");
 
             lockScreenApp.saveInfo("currentChessPositionAfterMove", null);
@@ -691,14 +666,12 @@ public class ChessView extends View {
                     && evY >= yNextTop
                     && evY <= yNextTop + buttonsSize
                     ) {
-              //Log.d(TAG, "touching \"forward\" icon to get new level when it is not lockScreen");
               isRightMove = false;
               isInitialChessPositionReady = false;
               Board.figureOnDesk = new Figure[8][8];
               possibleCoordinates = null;
               invalidate();
             }
-
           }
 
           if (!isEverythingSolved // not time to exit
@@ -713,13 +686,11 @@ public class ChessView extends View {
               timer = null;
               myTimerTask = null;
             }
-            LockScreenReceiver.needToAlive = false;//!!
-            //lockScreenApp.startSecondActivity();
+            LockScreenReceiver.needToAlive = false;
             LockScreenReceiver.startSecondActivity = true;
             lockScreenApp.finish();
 
           }
-
 
           if (evX >= xInfoLeft //touching "info" icon
                   && evX <= xInfoLeft + buttonsSize
@@ -728,7 +699,6 @@ public class ChessView extends View {
                   ) {
             createInfoDialog(getContext());
           }
-
 
           if (isWrongMove) {
 
@@ -747,8 +717,7 @@ public class ChessView extends View {
               invalidate();
             }
 
-            numberOfPossibleResolvingAttempts = lockScreenApp.loadOuterInfo("amountOfAttemptsToResolve");
-
+            numberOfPossibleResolvingAttempts = LockScreenReceiver.loadOuterInfoInt("amountOfAttemptsToResolve3", getContext());
             if (isDrawingResolving) {
               if (evX <= xRefreshLeft + buttonsSize //touching "refresh" icon to get the same level
                       && evX >= xRefreshLeft
@@ -763,7 +732,7 @@ public class ChessView extends View {
 
                 if (numberOfAlreadyResolved == null) {
                   lockScreenApp.saveInfo("alreadyResolved", "1");
-                } else if (Integer.parseInt(numberOfPossibleResolvingAttempts) > Integer.parseInt(numberOfAlreadyResolved)) {
+                } else if (numberOfPossibleResolvingAttempts > Integer.parseInt(numberOfAlreadyResolved)) {
                   lockScreenApp.saveInfo("alreadyResolved", Integer.toString(Integer.parseInt(numberOfAlreadyResolved) + 1));
                 }
                 numberOfAlreadyResolved = lockScreenApp.loadInfo("alreadyResolved");
@@ -774,30 +743,30 @@ public class ChessView extends View {
             }
           } else {
 
-            for (int i = 0; i < movingCoordinatesY.length; i++) {
-              if ((board.allFigures[i] != null) && evX >= movingCoordinatesX[i] - squareSize / 2
-                      && evX <= movingCoordinatesX[i] + squareSize / 3
-                      && evY >= movingCoordinatesY[i] - squareSize / (1.1)
-                      && evY <= movingCoordinatesY[i] + squareSize / 10
+            for (int i = 0; i < movingCoordinates.length; i++) {
+              if ((board.allFigures[i] != null) && evX >= movingCoordinates[i].x - squareSize / 2
+                      && evX <= movingCoordinates[i].x + squareSize / 3
+                      && evY >= movingCoordinates[i].y - squareSize / (1.1)
+                      && evY <= movingCoordinates[i].y + squareSize / 10
                       && board.allFigures[i].isWhite == isWhiteTurnToPlay) {
-                currentItemIndex = i;
-                currentFigure = board.allFigures[currentItemIndex];
-                isPrintingCircles = true;
+                itemInd = i;
+                currentFigure = board.allFigures[itemInd];
+                isDrawingCircles = true;
                 Log.d(TAG, "______________________________");
-                Log.d(TAG, "currentItemIndex = " + currentItemIndex + ",  " + board.allFigures[i].type);
-                startX = board.allFigures[currentItemIndex].posX;
-                startY = board.allFigures[currentItemIndex].posY;
-                // Log.d(TAG,"startX = " + board.allFigures[currentItemIndex].positionX +
-                //       ", startY = " + board.allFigures[currentItemIndex].positionY);
-                board.findPossibleMove(currentItemIndex);
+                Log.d(TAG, "itemInd = " + itemInd + ",  " + board.allFigures[i].type);
+                startX = board.allFigures[itemInd].posX;
+                startY = board.allFigures[itemInd].posY;
+                // Log.d(TAG,"startX = " + board.allFigures[itemInd].positionX +
+                //       ", startY = " + board.allFigures[itemInd].positionY);
+                board.findPossibleMove(itemInd);
                 possibleCoordinates = board.possibleMove;
                 isItemMoving = true;
 
                 invalidate();
 
                 drag = true;
-                dragX = evX - movingCoordinatesX[currentItemIndex];
-                dragY = evY - movingCoordinatesY[currentItemIndex];
+                dragX = evX - movingCoordinates[itemInd].x;
+                dragY = evY - movingCoordinates[itemInd].y;
               }
             }
 
@@ -808,54 +777,52 @@ public class ChessView extends View {
                 //Log.d(TAG, "before second touch 2 ");
                 for (int i = 0; i < possibleCoordinates.size(); i++) {
 
-                  if (evX - coordinatesInDeskSellsFloatX[possibleCoordinates.get(i).x] < squareSize / 2
-                          && evX - coordinatesInDeskSellsFloatX[possibleCoordinates.get(i).x] > -squareSize / 2
-                          && evY - coordinatesInDeskSellsFloatY[possibleCoordinates.get(i).y] +
+                  if (evX - coorInDeskCellsFloatX[possibleCoordinates.get(i).x] < squareSize / 2
+                          && evX - coorInDeskCellsFloatX[possibleCoordinates.get(i).x] > -squareSize / 2
+                          && evY - coorInDeskCellsFloatY[possibleCoordinates.get(i).y] +
                           (squareSize / (3.1f) + squareSize / 12) < squareSize / 2
-                          && evY - coordinatesInDeskSellsFloatY[possibleCoordinates.get(i).y] +
+                          && evY - coorInDeskCellsFloatY[possibleCoordinates.get(i).y] +
                           (squareSize / (3.1f) + squareSize / 12) > -squareSize / 2) {
 
                     //Log.d(TAG, "second touch");
                     isSecondTouch = true;
                     indOfPossibleMoveSecondTouch = i;
-                    movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[possibleCoordinates.get(i).x] - 10;
-                    movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[possibleCoordinates.get(i).y] - 10;
+                    movingCoordinates[itemInd].x = coorInDeskCellsFloatX[possibleCoordinates.get(i).x] - 10;
+                    movingCoordinates[itemInd].y = coorInDeskCellsFloatY[possibleCoordinates.get(i).y] - 10;
                     isItemMoving = true;
                     invalidate();
-
                     drag = true;
-                    dragX = evX - movingCoordinatesX[currentItemIndex];
-                    dragY = evY - movingCoordinatesY[currentItemIndex];
+                    dragX = evX - movingCoordinates[itemInd].x;
+                    dragY = evY - movingCoordinates[itemInd].y;
                   }
                 }
               }
             }
-
           }
           break;
 
         case MotionEvent.ACTION_MOVE:
           if (drag) {
-            movingCoordinatesX[currentItemIndex] = evX - dragX;
-            movingCoordinatesY[currentItemIndex] = evY - dragY;
+            movingCoordinates[itemInd].x = evX - dragX;
+            movingCoordinates[itemInd].y = evY - dragY;
 
-            invalidate(Math.max(0, (int) (movingCoordinatesX[currentItemIndex] - 2 * squareSize)),
-                    Math.max(0, (int) (movingCoordinatesY[currentItemIndex] - 2 * squareSize)),
-                    (int) Math.min(sideSize, (int) (movingCoordinatesX[currentItemIndex] + 2 * squareSize)),
-                    (int) Math.max(sideSize, (int) (movingCoordinatesY[currentItemIndex] + 2 * squareSize)));
+            invalidate(Math.max(0, (int) (movingCoordinates[itemInd].x - 2 * squareSize)),
+                    Math.max(0, (int) (movingCoordinates[itemInd].y - 2 * squareSize)),
+                    (int) Math.min(sideSize, (int) (movingCoordinates[itemInd].x + 2 * squareSize)),
+                    (int) Math.max(sideSize, (int) (movingCoordinates[itemInd].y + 2 * squareSize)));
 
             boolean isMoveCorrect = false;
 
             for (int k = 0; k < possibleCoordinates.size(); k++) {
-              if ((movingCoordinatesX[currentItemIndex] >= coordinatesInDeskSellsFloatX[possibleCoordinates.get(k).x] - squareSize / 2) &&
-                      (movingCoordinatesX[currentItemIndex] <= coordinatesInDeskSellsFloatX[possibleCoordinates.get(k).x] + squareSize / 2) &&
-                      (movingCoordinatesY[currentItemIndex] >= coordinatesInDeskSellsFloatY[possibleCoordinates.get(k).y] - squareSize / 2) &&
-                      (movingCoordinatesY[currentItemIndex] <= coordinatesInDeskSellsFloatY[possibleCoordinates.get(k).y] + squareSize / (2))) {
+              if ((movingCoordinates[itemInd].x >= coorInDeskCellsFloatX[possibleCoordinates.get(k).x] - squareSize / 2) &&
+                      (movingCoordinates[itemInd].x <= coorInDeskCellsFloatX[possibleCoordinates.get(k).x] + squareSize / 2) &&
+                      (movingCoordinates[itemInd].y >= coorInDeskCellsFloatY[possibleCoordinates.get(k).y] - squareSize / 2) &&
+                      (movingCoordinates[itemInd].y <= coorInDeskCellsFloatY[possibleCoordinates.get(k).y] + squareSize / (2))) {
                 Log.d(TAG, "isMoveCorrect = true;");
-                movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[possibleCoordinates.get(k).x];
-                movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[possibleCoordinates.get(k).y];
+                movingCoordinates[itemInd].x = coorInDeskCellsFloatX[possibleCoordinates.get(k).x];
+                movingCoordinates[itemInd].y = coorInDeskCellsFloatY[possibleCoordinates.get(k).y];
                 isMoveCorrect = true;
-                board.deskAndFigureAfterMove(currentItemIndex, k);
+                board.deskAndFigureAfterMove(itemInd, k);
               }
               if (board.isAlreadyCaptured) {
                 Log.d(TAG, "time to stop");
@@ -863,8 +830,8 @@ public class ChessView extends View {
               }
             }
             if (!isMoveCorrect) {
-              movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[board.allFigures[currentItemIndex].posX];
-              movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[board.allFigures[currentItemIndex].posY];
+              movingCoordinates[itemInd].x = coorInDeskCellsFloatX[board.allFigures[itemInd].posX];
+              movingCoordinates[itemInd].y = coorInDeskCellsFloatY[board.allFigures[itemInd].posY];
               Log.d(TAG, "isMoveCorrect = false;");
             }
           }
@@ -873,9 +840,9 @@ public class ChessView extends View {
         case MotionEvent.ACTION_UP:
 
           if (isSecondTouch) {
-            movingCoordinatesX[currentItemIndex] = coordinatesInDeskSellsFloatX[possibleCoordinates.get(indOfPossibleMoveSecondTouch).x];
-            movingCoordinatesY[currentItemIndex] = coordinatesInDeskSellsFloatY[possibleCoordinates.get(indOfPossibleMoveSecondTouch).y];
-            board.deskAndFigureAfterMove(currentItemIndex, indOfPossibleMoveSecondTouch);
+            movingCoordinates[itemInd].x = coorInDeskCellsFloatX[possibleCoordinates.get(indOfPossibleMoveSecondTouch).x];
+            movingCoordinates[itemInd].y = coorInDeskCellsFloatY[possibleCoordinates.get(indOfPossibleMoveSecondTouch).y];
+            board.deskAndFigureAfterMove(itemInd, indOfPossibleMoveSecondTouch);
             isSecondTouch = false;
             invalidate();
           }
@@ -893,20 +860,20 @@ public class ChessView extends View {
             if (currentFigure.type == Figure.Type.king) {// if castling - moving rook
               int rookInd = board.deskAndFiguresAfterCastling(startX, finishX, startY);
               if (rookInd != -1) {
-                movingCoordinatesX[rookInd] = coordinatesInDeskSellsFloatX[board.allFigures[rookInd].posX];
-                movingCoordinatesY[rookInd] = coordinatesInDeskSellsFloatY[board.allFigures[rookInd].posY];
+                movingCoordinates[rookInd].x = coorInDeskCellsFloatX[board.allFigures[rookInd].posX];
+                movingCoordinates[rookInd].y = coorInDeskCellsFloatY[board.allFigures[rookInd].posY];
 
-                invalidate(Math.max(0, (int) (movingCoordinatesX[currentItemIndex] - 2 * squareSize)),
-                        Math.max(0, (int) (movingCoordinatesY[currentItemIndex] - 5 * squareSize)),
-                        (int) Math.min(sideSize, (int) (movingCoordinatesX[currentItemIndex] + 2 * squareSize)),
-                        (int) Math.max(sideSize, (int) (movingCoordinatesY[currentItemIndex] + 5 * squareSize)));
+                invalidate(Math.max(0, (int) (movingCoordinates[itemInd].x - 2 * squareSize)),
+                        Math.max(0, (int) (movingCoordinates[itemInd].y - 5 * squareSize)),
+                        (int) Math.min(sideSize, (int) (movingCoordinates[itemInd].x + 2 * squareSize)),
+                        (int) Math.max(sideSize, (int) (movingCoordinates[itemInd].y + 5 * squareSize)));
               }
             }
 
             if (currentFigure.type == Figure.Type.pawn
                     && (currentFigure.isWhite && currentFigure.posY == 7
                     || !currentFigure.isWhite && currentFigure.posY == 0)) {
-              dialogPawn = new DialogPawn();
+              DialogPawn dialogPawn = new DialogPawn();
               dialogPawn.chessView = this;
               dialogPawn.isWhite = currentFigure.isWhite;
 
@@ -918,10 +885,10 @@ public class ChessView extends View {
 
               synchronized (this) {
                 Log.d(TAG, "before dialog invalidate");
-                invalidate(Math.max(0, (int) (movingCoordinatesX[currentItemIndex] - 2 * squareSize)),
-                        Math.max(0, (int) (movingCoordinatesY[currentItemIndex] - 2 * squareSize)),
-                        (int) Math.min(sideSize, (int) (movingCoordinatesX[currentItemIndex] + 2 * squareSize)),
-                        (int) Math.max(sideSize, (int) (movingCoordinatesY[currentItemIndex] + 2 * squareSize)));
+                invalidate(Math.max(0, (int) (movingCoordinates[itemInd].x - 2 * squareSize)),
+                        Math.max(0, (int) (movingCoordinates[itemInd].y - 2 * squareSize)),
+                        (int) Math.min(sideSize, (int) (movingCoordinates[itemInd].x + 2 * squareSize)),
+                        (int) Math.max(sideSize, (int) (movingCoordinates[itemInd].y + 2 * squareSize)));
 
                 Log.d(TAG, "after dialog invalidate ");
                 isNewItemChosen = false;
@@ -930,10 +897,10 @@ public class ChessView extends View {
             }
           }
 
-          if (startX != finishX || startY != finishY) { //check if this move was write or wrong
+          if (currentFigure != null && (startX != finishX || startY != finishY)) { //check if this move was write or wrong
 
             char figureTypeChar = ' ';
-            char colorChar = ' ';
+            char colorChar;
             switch (currentFigure.type) {
               case rook:
                 figureTypeChar = 'R';
@@ -954,7 +921,7 @@ public class ChessView extends View {
                 figureTypeChar = 'P';
                 break;
             }
-            if (currentFigure.isWhite){
+            if (currentFigure.isWhite) {
               colorChar = 'w';
             } else {
               colorChar = 'b';
@@ -968,7 +935,7 @@ public class ChessView extends View {
                     && colorChar == ChessPositions.allAnswers.get(indOfPosition).charAt(0)) {
 
               //right move
-              isPrintingCircles = false;
+              isDrawingCircles = false;
               refreshNumberOfAttempt(true);
               //Log.d(TAG, "current position after right move = " + board.currentChessPositionAfterMove() + whoseTurnToPlay);
               lockScreenApp.saveInfo("currentChessPositionAfterMove", board.currentChessPositionAfterMove() + whoseTurnToPlay);
@@ -983,30 +950,27 @@ public class ChessView extends View {
                 timer = null;
               }
               myTimerTask = null;
-
               isRightMove = true;
-              lockScreenApp.saveInfo("isRightMove", Boolean.toString(isRightMove));
+              lockScreenApp.saveInfo("isRightMove", "true");
               invalidate();
 
             } else {
               //wrong move,     change problem, unsolved problem move to the end of arraylist
-              isWorkingWithHandler = true;//**
-              isPrintingCircles = false;
+              Log.d(TAG, "   !!!    wrong move");
+              isWorkingWithHandler = true;
+              isDrawingCircles = false;
               refreshNumberOfAttempt(false);
               lockScreenApp.saveInfo("currentChessPositionAfterMove", board.currentChessPositionAfterMove() + whoseTurnToPlay);
               //Log.d(TAG, "current position after wrong move = " + board.currentChessPositionAfterMove()+whoseTurnToPlay);
               numberOfSuccessfulAttempt = lockScreenApp.loadInfo("numberOfSuccessfulAttempt");
-
-              Log.d(TAG, "   !!!    wrong move");
 
               oldIndex = indOfPosition;
               oldLoadUnsolvedLevels = lockScreenApp.loadUnsolvedLevels();
               oldIsLevelFromUnsolved = lockScreenApp.loadInfo("isLevelFromUnsolved");
 
               ChessPositions.saveUnsolvedPosition(indOfPosition, lockScreenApp);
-              int indOfNextPosition = ChessPositions.findIndexOfNextPositionAfterWrongMove(indOfPosition, lockScreenApp);
-              //Log.d(TAG,"   !!!    wrong move indOfNextPosition = " + indOfNextPosition);
-              indOfPosition = indOfNextPosition;
+              indOfPosition = ChessPositions.findIndexOfNextPositionAfterWrongMove(indOfPosition, lockScreenApp);
+              //Log.d(TAG,"   !!!    wrong move indOfNextPosition = " + indOfPosition);
               lockScreenApp.saveInfo("indOfPosition", Integer.toString(indOfPosition));
 
               if (timer != null) {
@@ -1016,15 +980,14 @@ public class ChessView extends View {
               myTimerTask = null;
 
               isWrongMove = true;
-              lockScreenApp.saveInfo("isWrongMove", Boolean.toString(isWrongMove));
+              lockScreenApp.saveInfo("isWrongMove", "true");
               numberOfAlreadyResolved = lockScreenApp.loadInfo("alreadyResolved");
-              numberOfPossibleResolvingAttempts = lockScreenApp.loadOuterInfo("amountOfAttemptsToResolve");
+              numberOfPossibleResolvingAttempts = LockScreenReceiver.loadOuterInfoInt("amountOfAttemptsToResolve3", getContext());
 
-              if (numberOfPossibleResolvingAttempts != null
-                      && (numberOfAlreadyResolved == null && Integer.parseInt(numberOfPossibleResolvingAttempts) > 1
-                      || numberOfAlreadyResolved != null && Integer.parseInt(numberOfPossibleResolvingAttempts) > Integer.parseInt(numberOfAlreadyResolved) + 1)) {
+              if (numberOfAlreadyResolved == null && numberOfPossibleResolvingAttempts > 1
+                      || numberOfAlreadyResolved != null && numberOfPossibleResolvingAttempts > Integer.parseInt(numberOfAlreadyResolved) + 1) {
                 isDrawingResolving = true;
-                lockScreenApp.saveInfo("isDrawingResolving", Boolean.toString(isDrawingResolving));
+                lockScreenApp.saveInfo("isDrawingResolving", "true");
               }
               invalidate();
             }
@@ -1033,7 +996,7 @@ public class ChessView extends View {
           }
           break;
       }
-    } else {////////
+    } else {
       Log.d(TAG, "problem with motion coordinates");
     }
     return true;
@@ -1041,7 +1004,7 @@ public class ChessView extends View {
 
 
   protected void afterDialogPawn() {
-    board.deskAndFiguresAfterPawnBecomesAnotherItem(this, chosenItem, currentItemIndex);
+    board.deskAndFiguresAfterPawnBecomesAnotherItem(this, chosenItem, itemInd);
 
   }
 
@@ -1049,21 +1012,20 @@ public class ChessView extends View {
   private boolean isWorkingWithHandler = false;
 
 
-  private void printAfterMove(Canvas canvas, boolean isRight) {
+  private void drawAfterMove(Canvas canvas, boolean isRight) {
     Bitmap bitmap;
     if (isRight) {
       bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.yes200);
     } else {
       bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no2002);
     }
-    printBitmap(canvas, bitmap, (int) sideSize / 3, (int) sideSize / 3, (int) (2 * sideSize / 3), (int) (2 * sideSize / 3), 150);
+    drawBitmap(canvas, bitmap, (int) sideSize / 3, (int) sideSize / 3, (int) (2 * sideSize / 3), (int) (2 * sideSize / 3));
     if (!isRight) {
-
-      printBitmapWithColorFilter(canvas, BitmapFactory.decodeResource(getResources(), R.drawable.button7),//next64
+      drawBitmapWithColorFilter(canvas, BitmapFactory.decodeResource(getResources(), R.drawable.button7),//next64
               xNextLeft, yNextTop, xNextLeft + buttonsSize, yNextTop + buttonsSize);
       canvas.drawText(forward, xNextLeft + (buttonsSize - forwardWidth) / 2, yNextTop + buttonsSize / 2 + forwardHeight / 2.4f, iconPaint);
       if (isDrawingResolving) {
-        printBitmapWithColorFilter(canvas, BitmapFactory.decodeResource(getResources(), R.drawable.button7),//refresh64
+        drawBitmapWithColorFilter(canvas, BitmapFactory.decodeResource(getResources(), R.drawable.button7),//refresh64
                 xRefreshLeft, yRefreshTop, xRefreshLeft + buttonsSize, yRefreshTop + buttonsSize);
         canvas.drawText(refresh, xRefreshLeft + (buttonsSize - refreshWidth) / 2, yRefreshTop + buttonsSize / 2 + refreshHeight / 2.3f, iconPaint);
       }
@@ -1086,7 +1048,6 @@ public class ChessView extends View {
           if (safetyMove != null) {
             oldX = board.allFigures[safetyMove[2]].posX;
             oldY = board.allFigures[safetyMove[2]].posY;
-            //Log.d(TAG,"oldX = "+oldX+" oldY = "+oldY);
             lockScreenApp.handler.sendMessageDelayed(lockScreenApp.handler.obtainMessage(safetyMove[2], safetyMove[0], safetyMove[1]), 1000); //1 - item index , 2 - xCoor, 3 - yCoor
             lockScreenApp.handler.sendMessageDelayed(lockScreenApp.handler.obtainMessage(safetyMove[2], oldX, oldY), 2000);
           } else {
@@ -1099,7 +1060,7 @@ public class ChessView extends View {
     }
 
     if (isRight && !lockScreenApp.isLockScreen) {
-      printBitmapWithColorFilter(canvas, BitmapFactory.decodeResource(getResources(), R.drawable.button7),//next64
+      drawBitmapWithColorFilter(canvas, BitmapFactory.decodeResource(getResources(), R.drawable.button7),//next64
               xNextLeft, yNextTop, xNextLeft + buttonsSize, yNextTop + buttonsSize);
       canvas.drawText(forward, xNextLeft + (buttonsSize - forwardWidth) / 2, yNextTop + buttonsSize / 2 + forwardHeight / 2.4f, iconPaint);
     }
@@ -1191,7 +1152,7 @@ public class ChessView extends View {
         @Override
         public void run() {
           invalidate();
-          Log.d(TAG, "runnable _ invalidating chessviev");
+          Log.d(TAG, "runnable _ invalidating chessView");
         }
       });
     }
@@ -1199,9 +1160,8 @@ public class ChessView extends View {
 
 
   protected void handlerMethod(android.os.Message msg) {
-    //Log.d(TAG,"handler got message what = "+ msg.what + "  arg1 = "+ msg.arg1 + " arg2 = "+msg.arg2);
-    movingCoordinatesX[msg.what] = coordinatesInDeskSellsFloatX[msg.arg1];
-    movingCoordinatesY[msg.what] = coordinatesInDeskSellsFloatY[msg.arg2];
+    movingCoordinates[msg.what].x = coorInDeskCellsFloatX[msg.arg1];
+    movingCoordinates[msg.what].y = coorInDeskCellsFloatY[msg.arg2];
     invalidate();
   }
 
