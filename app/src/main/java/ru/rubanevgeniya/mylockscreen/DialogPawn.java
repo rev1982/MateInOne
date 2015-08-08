@@ -11,7 +11,7 @@ public class DialogPawn extends DialogFragment {
   protected Figure.Type chosenItem;
   protected CharSequence[] charSequences;
   protected ChessView chessView;
-  private CharSequence[] blackItems = new CharSequence[]{"\u265B ", "\u265C ", "\u265D ", "\u265E "};
+  private CharSequence[] blackItems = new CharSequence[]{"\u265B ", "\u265C ", "\u265D ", "\u265E "};//TODO  can't change to font
   private String title = getResources().getString(R.string.chooseOneItem);
   private static final String TAG = "Log = ";
 
@@ -22,27 +22,22 @@ public class DialogPawn extends DialogFragment {
     if (isWhite) {
       charSequences = whiteItems;
     }
-
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     builder//.setMessage("choose one item")
             .setItems(charSequences, new DialogInterface.OnClickListener() {
               public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
                   chosenItem = Figure.Type.queen;
-                  afterChoice();
                 } else if (which == 1) {
                   chosenItem = Figure.Type.rook;
-                  afterChoice();
                 } else if (which == 2) {
                   chosenItem = Figure.Type.bishop;
-                  afterChoice();
                 } else if (which == 3) {
                   chosenItem = Figure.Type.knight;
-                  afterChoice();
                 }
+                afterChoice();
               }
             })
-
             .setTitle(title);
     return builder.create();
   }

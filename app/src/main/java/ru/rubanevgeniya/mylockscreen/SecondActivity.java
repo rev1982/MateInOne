@@ -21,24 +21,28 @@ import android.widget.Toast;
 
 public class SecondActivity extends PhoenixActivity {
   private static final String TAG = "Logs SecondActivity : ";
+  public static final int INVALID = -1000;
   private boolean isLocked;
   private long CODE;
   private TextView textView;
   private TextView textView0;
   private static final Object monitor = new Object();
   private String code = "";
+  private Toast toast1;
+  private  boolean isSettings;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-
     super.onCreate(savedInstanceState);
+    isSettings = getIntent().getStringExtra("what").equals("settings");
+    LockScreenReceiver.isStartSettings = isSettings;
     boolean isPortrait = false;
     isLocked = LockScreenReceiver.loadOuterInfoBoolean("isLocked2", this);
     if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
       isPortrait = true;
     }
 
-    MyPhoneStateListener.secondActivity = this;
+    PhoneStateListern.secondActivity = this;
     LockScreenReceiver.secondActivity = this;
     LockScreenReceiver.needToAlive = isLocked;
     Log.d(TAG, " SecondActivity onCreate ,   LockScreenReceiver.needToAlive = " + LockScreenReceiver.needToAlive + " isLocked = " + isLocked);
@@ -48,24 +52,34 @@ public class SecondActivity extends PhoenixActivity {
     RadioGroup.LayoutParams layoutParams =
             new RadioGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-
-    Typeface typeface = Typeface.createFromAsset(this.getAssets(), "fonts/fontawesome.woff");
-
+    Typeface typeface = Typefaces.get(this,"fonts/fontawesome.ttf");
     int fontSize = (int) getResources().getDimension(R.dimen.textsize);
 
     textView = new TextView(this);
     TextView textView00 = new TextView(this);
     textView00.setText("");
-    TextView textView000 = new TextView(this);
-    textView000.setText("");
+
+    TextView textViewArrow = new TextView(this);
+    //textView000.setText("");
+    textViewArrow.setTypeface(Typefaces.get(this, "fonts/fontawesome.ttf"));
+    textViewArrow.setGravity(Gravity.LEFT);
+    textViewArrow.setTextSize(fontSize);
+    textViewArrow.setTextColor(getResources().getColor(R.color.mybg10));
+    textViewArrow.setText("\n  " + getResources().getText(R.string.strArrow));
+    textViewArrow.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        startLockScreenApp();
+      }
+    });
 
     textView0 = new TextView(this);
-    textView0.setText(getResources().getString(R.string.enterTheSecretCode));
+    textView0.setText(isSettings? getResources().getString(R.string.enterTheSecretCodeToOpenSettings)
+            : getResources().getString(R.string.enterTheSecretCodeToUnlock));
     TextView textView1 = new TextView(this);
     textView1.setText(" ");
     textView0.setGravity(Gravity.CENTER);
     textView0.setTextColor(getResources().getColor(R.color.mybg9));
-    textView0.setTypeface(Typeface.SERIF, Typeface.BOLD);
     textView0.setTextSize(fontSize);
 
     textView.setText("_ _ _ _ _ _");
@@ -73,99 +87,80 @@ public class SecondActivity extends PhoenixActivity {
     textView.setGravity(Gravity.CENTER);
     textView.setTypeface(Typeface.SERIF, Typeface.BOLD);
 
-    Button[] buttons = new Button[14];
+    Button[] buttons = new Button[12]; //[14];
 
     TableLayout table = new TableLayout(this);
     table.setGravity(Gravity.CENTER);
-    table.addView(textView000);
+    //table.addView(textView000);
+
+//    View merge = (View) findViewById(R.id.mergesecond);
+//    table.addView(merge);
+
+    table.addView(textViewArrow);
     table.addView(textView0);
     table.addView(textView00);
     table.addView(textView);
     table.addView(textView1);
 
-    if (isPortrait) {
+    TableRow tableRow1 = new TableRow(this);
+    tableRow1.setGravity(Gravity.CENTER);
+    TableRow tableRow2 = new TableRow(this);
+    tableRow2.setGravity(Gravity.CENTER);
 
-      TableRow tableRow1 = new TableRow(this);
-      tableRow1.setGravity(Gravity.CENTER);
+    for (int i = 0; i < 9; i++) {
+      buttons[i] = new Button(this);
+      buttons[i].setText(Integer.toString(i + 1));
+    }
+    buttons[9] = new Button(this);
+    buttons[9].setText("0");
+    buttons[10] = new Button(this);
+    buttons[10].setTypeface(typeface);
+    buttons[10].setText("\uF060");
+    buttons[11] = new Button(this);
+    buttons[11].setTypeface(typeface);
+    buttons[11].setText("ok");
+    TableRow tableRow3 = null;
+    TableRow tableRow4 = null;
+    if (isPortrait) {
       for (int i = 0; i < 3; i++) {
-        buttons[i] = new Button(this);
-        buttons[i].setText(Integer.toString(i + 1));
         buttons[i].setWidth(table.getWidth() / 3);
         tableRow1.addView(buttons[i]);
       }
-      table.addView(tableRow1);
-
-      TableRow tableRow2 = new TableRow(this);
-      tableRow2.setGravity(Gravity.CENTER);
       for (int i = 3; i < 6; i++) {
-        buttons[i] = new Button(this);
-        buttons[i].setText(Integer.toString(i + 1));
         tableRow2.addView(buttons[i]);
       }
-      table.addView(tableRow2);
-
-      TableRow tableRow3 = new TableRow(this);
+      tableRow3 = new TableRow(this);
       tableRow3.setGravity(Gravity.CENTER);
       for (int i = 6; i < 9; i++) {
-        buttons[i] = new Button(this);
-        buttons[i].setText(Integer.toString(i + 1));
         tableRow3.addView(buttons[i]);
       }
-      table.addView(tableRow3);
-
-      TableRow tableRow4 = new TableRow(this);
+      tableRow4 = new TableRow(this);
       tableRow4.setGravity(Gravity.CENTER);
-      buttons[9] = new Button(this);
-      buttons[9].setText("   0   ");
-      buttons[10] = new Button(this);
-      buttons[10].setTypeface(typeface);
-      buttons[10].setText("\uF060");
-      buttons[11] = new Button(this);
-      buttons[11].setTypeface(typeface);
-      buttons[11].setText("\uF064");
-      buttons[11].setRotation(180);
-
       tableRow4.addView(buttons[9]);
       tableRow4.addView(buttons[10]);
       tableRow4.addView(buttons[11]);
-      table.addView(tableRow4);
-
     } else {
-
-      TableRow tableRow1 = new TableRow(this);
-      tableRow1.setGravity(Gravity.CENTER);
       for (int i = 0; i < 6; i++) {
-        buttons[i] = new Button(this);
-        buttons[i].setText(Integer.toString(i + 1));
         buttons[i].setWidth(table.getWidth() / 6);
         tableRow1.addView(buttons[i]);
       }
-      table.addView(tableRow1);
-
-      TableRow tableRow2 = new TableRow(this);
-      tableRow2.setGravity(Gravity.CENTER);
-      for (int i = 6; i < 9; i++) {
-        buttons[i] = new Button(this);
-        buttons[i].setText(Integer.toString(i + 1));
+      for (int i = 6; i < 12; i++) {
         tableRow2.addView(buttons[i]);
       }
-      buttons[9] = new Button(this);
-      buttons[9].setText("   0   ");
-      buttons[10] = new Button(this);
-      buttons[10].setTypeface(typeface);
-      buttons[10].setText("\uF060");
-      buttons[11] = new Button(this);
-      buttons[11].setTypeface(typeface);
-      buttons[11].setText("\uF064");
-      buttons[11].setRotation(180);
-      buttons[8].setText("   9   ");
-      buttons[7].setText("   8   ");
-      buttons[6].setText("   7   ");
+    }
+    table.addView(tableRow1);
+    table.addView(tableRow2);
+    if (tableRow3 != null){
+      table.addView(tableRow3);
+      table.addView(tableRow4);
+    }
 
-      tableRow2.addView(buttons[9]);
-      tableRow2.addView(buttons[10]);
-      tableRow2.addView(buttons[11]);
-      table.addView(tableRow2);
+    for (int i = 0; i < 11; i++) {
+      buttons[i].setTypeface(typeface);
+      buttons[i].setMinWidth(2 * fontSize);
+      buttons[i].setMaxWidth(2 * fontSize);
+      buttons[i].setMaxHeight((int)(1.2f * fontSize));
+      buttons[i].setMinHeight((int)(1.2f * fontSize));
     }
 
     TextView textView2 = new TextView(this);
@@ -173,27 +168,25 @@ public class SecondActivity extends PhoenixActivity {
     textView2.setTextSize((fontSize / 2));
     table.addView(textView2);
 
-    buttons[12] = new Button(this);
-    buttons[12].setText(getResources().getString(R.string.backToChess) + " " + "\u265F ");
-    buttons[12].requestLayout();
-    table.addView(buttons[12]);
-    buttons[13] = new Button(this);
-    buttons[13].setText(getResources().getString(R.string.Settings));
-    table.addView(buttons[13]);
-
+//    buttons[12] = new Button(this);
+//    buttons[12].setText(getResources().getString(R.string.backToChess) + " " + "\u265F ");
+//    buttons[12].requestLayout();
+//    table.addView(buttons[12]);
+//    buttons[13] = new Button(this);
+//    buttons[13].setText(getResources().getString(R.string.Settings));
+//    table.addView(buttons[13]);
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-
         v.setPressed(true);
         int ind = v.getId();
         String text = textView.getText().toString();
+        //String.valueOf(textView.getText());
         if (text.equals("_ _ _ _ _ _")) {
           text = "";
           code = "";
         }
-
         for (int i = 0; i < 9; i++) {
           if (i == ind) {
             textView.setText(text + "*");
@@ -211,15 +204,12 @@ public class SecondActivity extends PhoenixActivity {
             code = "";
             break;
           case 11:
-            checkCode(code);
+            if (isSettings) {
+              checkCodeToStartSettings(code);
+            } else {
+              checkCode(code);
+            }
             break;
-          case 12:
-            startLockScreenApp();
-            break;
-          case 13:
-            checkCodeToStartSettings(code);
-            break;
-
         }
 
         synchronized (monitor) {
@@ -234,19 +224,16 @@ public class SecondActivity extends PhoenixActivity {
       }
     };
 
-
     for (int i = 0; i < buttons.length; i++) {
       buttons[i].setId(i);
       buttons[i].setTextSize((fontSize / 6 * 5));
       buttons[i].setTextColor(getResources().getColor(R.color.mybg9));
     }
-
-    for (int i = 0; i < buttons.length; i++) {
-      buttons[i].setOnClickListener(onClickListener);
+    for (Button button : buttons) {
+      button.setOnClickListener(onClickListener);
     }
-
     table.setLayoutParams(layoutParams);
-    LinearLayout linearLayout = new LinearLayout(this);
+    LinearLayout linearLayout =  new LinearLayout(this);//(LinearLayout) findViewById(R.id.secondActLayout); //new LinearLayout(this);
     RadioGroup.LayoutParams layoutParams2 =
             new RadioGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT);
@@ -255,13 +242,14 @@ public class SecondActivity extends PhoenixActivity {
     linearLayout.setGravity(Gravity.CENTER_HORIZONTAL);
     linearLayout.setBackgroundColor(getResources().getColor(R.color.mybg4));
     setContentView(linearLayout, layoutParams2);
+    //setContentView(R.layout.second_act_merge);
 
   }
 
-
   private void checkCode(String text) {
-    Log.d(TAG, "check code :  getIntent().getFlags() = " + getIntent().getFlags());
-    if (CODE == -1000 || Long.parseLong(text)== CODE || !isLocked) {
+    Log.d(TAG, "check code = " + text);
+    if (text != null && text.length() > 0 && Long.parseLong(text) == CODE) {
+    //if (CODE == INVALID || (text != null && text.length() > 0 && Long.parseLong(text) == CODE) || !isLocked) {
       LockScreenReceiver.saveInfoForOuterBoolean("isLocked2", false, this);
       LockScreenReceiver.needToAlive = false;
       this.finish();
@@ -274,14 +262,21 @@ public class SecondActivity extends PhoenixActivity {
   private void checkCodeToStartSettings(String text) {
     CODE = LockScreenReceiver.loadOuterInfoLong("code2", this);
     Log.d(TAG, "loaded code = " + CODE);
-    if (CODE == -1000 || Long.parseLong(text) == CODE) {
+    //if (CODE == INVALID || (text != null && text.length() > 0 && Long.parseLong(text) == CODE)) {
+    if (text != null && text.length() > 0 && Long.parseLong(text) == CODE) {
       Intent intent = new Intent(this, SettingsActivity.class);
       intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       startActivity(intent);
       LockScreenReceiver.needToAlive = false;
       this.finish();
     } else {
-      Toast.makeText(this, getResources().getString(R.string.enterTheSecretCodeAndThenPressSettings), Toast.LENGTH_SHORT).show();
+      textView0.setText(getResources().getString(R.string.tryOnceMore));
+      textView.setText("_ _ _ _ _ _");
+//      if (toast1 != null) {
+//        toast1.cancel();
+//      }
+//      toast1 = Toast.makeText(this, getResources().getString(R.string.enterTheSecretCodeAndThenPressSettings), Toast.LENGTH_SHORT);
+//      toast1.show();
     }
   }
 
@@ -296,43 +291,6 @@ public class SecondActivity extends PhoenixActivity {
 
   @Override
   public void onBackPressed() {
-    if (isLocked) {
-      Toast toast = Toast.makeText(this, getResources().getString(R.string.toUnlockEnter), Toast.LENGTH_LONG);
-      toast.show();
-    } else {
-      super.onBackPressed();
-    }
+    startLockScreenApp();
   }
-
-  @Override
-  public void onResume() {
-    Log.d(TAG, " SecondActivity onResume");
-    super.onResume();
-  }
-
-  @Override
-  public void onDestroy() {
-    Log.d(TAG, " SecondActivity onDestroy");
-    super.onDestroy();
-  }
-
-  @Override
-  public void onStop() {
-    Log.d(TAG, " SecondActivity onStop");
-    super.onStop();
-  }
-
-  @Override
-  public void onStart() {
-    super.onStart();
-    Log.d(TAG, " SecondActivity onStart");
-  }
-
-  @Override
-  public void onRestart() {
-    Log.d(TAG, " SecondActivity onRestart");
-    super.onRestart();
-  }
-
-
 }

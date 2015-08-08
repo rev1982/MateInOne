@@ -35,4 +35,13 @@
     <color name="mybg9">#37474f</color>
     <color name="mybg10">#263238</color>
 
+    <color name="green1">#A15AFE53</color>
+    <color name="green2">#FF7AFF67</color>
+    <color name="green3">#FF3BFFB8</color>
+    <color name="red1">#A4FF2F3E</color>
+    <color name="red2">#D6FF1A24</color>
+    <color name="red3">#FFFF102E</color>
+    <color name="pink">#8AE82630</color>
+    <color name="green">#F2269984</color>
+
 </resources>

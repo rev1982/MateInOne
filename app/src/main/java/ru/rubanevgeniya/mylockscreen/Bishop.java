@@ -1,10 +1,12 @@
 package ru.rubanevgeniya.mylockscreen;
 
 
+import android.util.Log;
+
 public class Bishop extends Figure {
 
-  public Bishop(boolean isWhite, int posX, int posY, String image, Type type) {
-    super(isWhite, posX, posY, image, type);
+  public Bishop(boolean isWhite, int posX, int posY) {
+    super(isWhite, posX, posY, "v", Type.bishop);
   }
 
   @Override
@@ -12,8 +14,8 @@ public class Bishop extends Figure {
     possibleMove.clear();
     addPosition(figureOnBoard, 1, 1);
     addPosition(figureOnBoard, -1, -1);
-    addPosition(figureOnBoard,  -1, 1);
-    addPosition(figureOnBoard,  1, -1);
+    addPosition(figureOnBoard, -1, 1);
+    addPosition(figureOnBoard, 1, -1);
     addPosition(figureOnBoard, 1, -1);
   }
 
@@ -22,43 +24,27 @@ public class Bishop extends Figure {
     int kX = 1;
     int kY = 1;
     boolean isContinue = true;
-    while (isContinue ) {
-      if ((posY + kY * signY < 8) && (posY + kY * signY > -1) && (posX + kX * signX < 8) && (posX + kX * signX > -1)
-              && (figureOnBoard[posX + kX * signX][posY + kY * signY] == null)) {
-        pos = new Pos(posX + kX * signX, posY + kY * signY);
-        possibleMove.add(pos);
+    while (isContinue) {
+      int x = posX + kX * signX;
+      int y = posY + kY * signY;
+      if (y < 8 && y > -1 && x < 8 && x > -1) {
+        if (figureOnBoard[x][y] == null) {
+          pos = new Pos(x, y);
+          possibleMove.add(pos);
+        } else {
+          isContinue = false;
+          if (figureOnBoard[x][y] != null && figureOnBoard[x][y].isWhite == !isWhite
+            // &&(!figureOnBoard[positionX+kX*signX][positionY+kY*signY].type.equals("king"))
+                  ) {
+            pos = new Pos(x, y);
+            possibleMove.add(pos);
+          }
+        }
+        kX++;
+        kY++;
       } else {
         isContinue = false;
-        if ((posY + kY * signY < 8) && (posY + kY * signY > -1) && (posX + kX * signX < 8) && (posX + kX * signX > -1)
-                && figureOnBoard[posX + kX * signX][posY + kY * signY] != null
-        && figureOnBoard[posX + kX * signX][posY + kY * signY].isWhite == !isWhite
-          // &&(!figureOnBoard[positionX+kX*signX][positionY+kY*signY].type.equals("king"))
-                ) {
-          pos = new Pos(posX + kX * signX, posY + kY * signY);
-          possibleMove.add(pos);
-        }
       }
-      kX++;
-      kY++;
     }
-
-//    for(boolean isContinue = true; isContinue; kX += signX, kY += signY) {
-//      if ((y < 8) && (y > -1) && (x < 8) && (x > -1)
-//              && (figureOnBoard[x][y] == null)) {
-//        pos = new Pos(x, y);
-//        possibleMove.add(pos);
-//      } else {
-//        isContinue = false;
-//        if ((y < 8) && (y > -1) && (x < 8) && (x > -1)
-//                && figureOnBoard[posX + kX * signX][posY + kY * signY].isWhite == !isWhite
-//          // &&(!figureOnBoard[positionX+kX*signX][positionY+kY*signY].type.equals("king"))
-//                ) {
-//          pos = new Pos(x, y);
-//          possibleMove.add(pos);
-//        }
-//      }
-//    }
-
-
   }
 }

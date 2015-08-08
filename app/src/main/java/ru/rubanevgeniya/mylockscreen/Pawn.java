@@ -2,10 +2,9 @@ package ru.rubanevgeniya.mylockscreen;
 
 
 public class Pawn extends Figure {
-  public Pawn(boolean isWhite, int posX, int posY, String image, Type type) {
-    super(isWhite, posX, posY, image, type);
+  public Pawn(boolean isWhite, int posX, int posY) {
+    super(isWhite, posX, posY, "o", Type.pawn);
   }
-
 
   @Override
   void findPossibleMove(Figure[][] figureOnBoard) {
@@ -27,28 +26,29 @@ public class Pawn extends Figure {
 
   private void addPosition(Figure[][] figureOnBoard, int kX, int kY, int signY) {
     Pos pos;
-    if (kY == 2) {
-      if ((posY + kY * signY < 8) && (posY + kY * signY > -1)
-              && (figureOnBoard[posX][posY + kY * signY] == null)
-              && (figureOnBoard[posX][posY + (kY - 1) * signY] == null)) {
-        pos = new Pos(posX, posY + kY * signY);
+    int x = posX + kX;
+    int y = posY + kY * signY;
+    if ((y < 8) && (y > -1)) {
+      if (kY == 2) {
+        if ((figureOnBoard[posX][y] == null)
+                && (figureOnBoard[posX][posY + (kY - 1) * signY] == null)) {
+          pos = new Pos(posX, y);
+          possibleMove.add(pos);
+        }
+      } else {
+        if (figureOnBoard[posX][y] == null) {
+          pos = new Pos(posX, y);
+          possibleMove.add(pos);
+        }
+      }
+      if ((kX != 0) && (x < 8) && (x > -1)
+              && figureOnBoard[x][y] != null
+              && figureOnBoard[x][y].isWhite == !isWhite
+        //&&(!figureOnBoard[posX+kX][posY+kY*signY].type.equals("king"))
+              ) {
+        pos = new Pos(x, y);
         possibleMove.add(pos);
       }
-    } else {
-      if ((posY + kY * signY < 8) && (posY + kY * signY > -1)
-              && (figureOnBoard[posX][posY + kY * signY] == null)) {
-        pos = new Pos(posX, posY + kY * signY);
-        possibleMove.add(pos);
-      }
-    }
-    if ((kX != 0) && (posY + kY * signY < 8) && (posY + kY * signY > -1) && (posX + kX < 8)
-            && (posX + kX > -1)
-            && figureOnBoard[posX + kX][posY + kY * signY] != null
-            && figureOnBoard[posX + kX][posY + kY * signY].isWhite == !isWhite
-      //&&(!figureOnBoard[posX+kX][posY+kY*signY].type.equals("king"))
-            ) {
-      pos = new Pos(posX + kX, posY + kY * signY);
-      possibleMove.add(pos);
     }
   }
 }

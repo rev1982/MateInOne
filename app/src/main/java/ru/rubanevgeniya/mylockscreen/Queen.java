@@ -3,8 +3,8 @@ package ru.rubanevgeniya.mylockscreen;
 
 public class Queen extends Figure {
 
-  public Queen(boolean isWhite, int posX, int posY, String image, Type type) {
-    super(isWhite, posX, posY, image, type);
+  public Queen(boolean isWhite, int posX, int posY) {
+    super(isWhite, posX, posY, "w", Type.queen);
   }
 
   @Override
@@ -23,26 +23,27 @@ public class Queen extends Figure {
   private void addPosition(Figure[][] figureOnBoard, int kX, int kY, int signX, int signY) {
     Pos pos;
     boolean isContinue = true;
-
     while (isContinue) {
-      if ((posY + kY * signY < 8) && (posY + kY * signY > -1) && (posX + kX * signX < 8) && (posX + kX * signX > -1)
-              && (figureOnBoard[posX + kX * signX][posY + kY * signY] == null)) {
-        pos = new Pos(posX + kX * signX, posY + kY * signY);
-        possibleMove.add(pos);
+      int x = posX + kX * signX;
+      int y = posY + kY * signY;
+      if (y < 8 && y > -1 && x < 8 && x > -1) {
+        if (figureOnBoard[x][y] == null) {
+          pos = new Pos(x, y);
+          possibleMove.add(pos);
+        } else {
+          isContinue = false;
+          if (figureOnBoard[x][y].isWhite == !isWhite
+            //&&(!figureOnBoard[posX+kX*signX][posY+kY*signY].type.equals("king"))
+                  ) {
+            pos = new Pos(x, y);
+            possibleMove.add(pos);
+          }
+        }
+        kX++;
+        kY++;
       } else {
         isContinue = false;
-        if ((posY + kY * signY < 8) && (posY + kY * signY > -1) && (posX + kX * signX < 8) && (posX + kX * signX > -1)
-                && figureOnBoard[posX + kX * signX][posY + kY * signY] != null
-                && figureOnBoard[posX + kX * signX][posY + kY * signY].isWhite == !isWhite
-          //&&(!figureOnBoard[posX+kX*signX][posY+kY*signY].type.equals("king"))
-                ) {
-          pos = new Pos(posX + kX * signX, posY + kY * signY);
-          possibleMove.add(pos);
-        }
       }
-      kX++;
-      kY++;
     }
   }
-
 }

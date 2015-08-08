@@ -1,11 +1,9 @@
 package ru.rubanevgeniya.mylockscreen;
 
-/**
- * Created by rey on 7/25/2015.
- */
+
 public class Coordinate {
-  float x;
-  float y;
+  protected float x;
+  protected float y;
 
   Coordinate(float x, float y) {
     this.x = x;

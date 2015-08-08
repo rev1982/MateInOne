@@ -13,10 +13,12 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
 import java.util.List;
 
 
 public class LockScreenReceiver extends BroadcastReceiver {
+  public static final int INVALID = -1000;
   protected static Class onTop;
   protected static boolean needToAlive;
   protected static boolean isPhoneCalling;
@@ -27,8 +29,10 @@ public class LockScreenReceiver extends BroadcastReceiver {
   private Intent intent2;
   private long timeOfCreatingIntent2;
   private static String TAG = "Log LockScreenReceiver : ";
-  protected static boolean needToStartLock;
-  protected static boolean startSecondActivity;
+  //protected static boolean needToStartLock;
+  protected static boolean startSecondActivityUnlock;
+  protected static boolean startSecondActivitySettings;
+  protected  static boolean isStartSettings;
 
 
   public LockScreenReceiver() {
@@ -39,18 +43,15 @@ public class LockScreenReceiver extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
     long timeOfDelay;
     int delay = loadOuterInfoInt("delay3", context);
-    if (delay <= 0) {
-      timeOfDelay = 10000;
-    } else {
-      timeOfDelay = 1000 * delay;
-    }
+    timeOfDelay = (delay <= 0) ? 10000 : 1000 * delay;
     PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
     long currentTime = System.currentTimeMillis();
     long lastDecisionTime = loadOuterInfoLong("time2", context);
+    int numOfLevelsToSolveToUnlockWhenScreenOn = loadOuterInfoInt("amountOfLevelsToSolve3",context);
     Long deltaTime = calcDeltaTime(loadOuterInfoInt("days3", context), loadOuterInfoInt("hours3", context), loadOuterInfoInt("minutes3", context));
-    Log.d(TAG, " point 3 ");
+    Log.d(TAG, " point 3 , ");
     Log.i(TAG, " intent.getAction() " + intent.getAction() + "; intent.getCategories() =  "
-            + intent.getCategories() + " intent.getFlags() = " + intent.getFlags());
+            + intent.getCategories());
     Log.d(TAG, " screenOn = " + pm.isScreenOn());
     Log.d(TAG, " onTop = " + onTop);
     Log.d(TAG, " intent.getIntExtra(\"code\",0) = " + intent.getIntExtra("code", 0));
@@ -59,7 +60,7 @@ public class LockScreenReceiver extends BroadcastReceiver {
       //restart app after pressing home button (using AlarmService) if no phone calls and screen is On
       if (intent.getIntExtra("code", 0) > 0) {
         if ((onTop == null) && !isPhoneCalling && pm.isScreenOn() &&
-                (lastDecisionTime == -1000
+                (lastDecisionTime == INVALID
                         || lastDecisionTime + deltaTime < currentTime)) {
 
           Log.d(TAG, " point 3.0.1 start activity ");
@@ -79,38 +80,32 @@ public class LockScreenReceiver extends BroadcastReceiver {
             }
             intent11 = new Intent(context, SecondActivity.class);
             intent11.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent11.putExtra("what", isStartSettings ? "settings" : "unlock");
             context.startActivity(intent11);
           }
-          needToStartLock = false;
-
-          ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-          List<ActivityManager.RunningAppProcessInfo> runningAppProcess = activityManager.getRunningAppProcesses();
-          String firstProcess = runningAppProcess.get(0).pkgList[0];
-          Log.d(TAG, " firstProcess = " + firstProcess + " , " +
-                  "it's permission = " + context.getPackageManager().checkPermission("android.permission.WAKE_LOCK", firstProcess));
-
+          //needToStartLock = false;
         } else if (!pm.isScreenOn()) {
           Log.d(TAG, " point 3.0.2 screen off , finish ");
           finishLockScreenApp();
         }
       } else {
-        Log.d(TAG, " point 3.0.3 wrong intent flag, don't start activity ");
+        Log.d(TAG, " point 3.0.3 wrong intent.getIntExtra, don't start activity ");
       }
 
     } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-      needToStartLock = false;
+      //needToStartLock = false;
       finishLockScreenApp();
       saveInfoForOuterBoolean("isLocked2", false, context);
       if (System.currentTimeMillis() < timeOfCreatingIntent2 + timeOfDelay) {
         if (intent2 != null) {
-          intent2.setFlags(22);
+          intent2.putExtra("code", -1111);
           timeOfCreatingIntent2 = 0;
         }
       }
       Log.d(TAG, " point 3.1 screen off ");
 
-    } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON) && !isPhoneCalling) {
-
+    } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON) && !isPhoneCalling
+            && numOfLevelsToSolveToUnlockWhenScreenOn > 0) {
       ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
       List<ActivityManager.RunningAppProcessInfo> runningAppProcess = activityManager.getRunningAppProcesses();
       String firstProcess = runningAppProcess.get(0).pkgList[0];
@@ -122,7 +117,6 @@ public class LockScreenReceiver extends BroadcastReceiver {
         noApplicationStart = true;
         Log.d(TAG, " point 3.2.1 screen on, no need to start ");
       } else {
-
         final AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         final AudioManager.OnAudioFocusChangeListener audioListener = new AudioManager.OnAudioFocusChangeListener() {
           @Override
@@ -144,7 +138,6 @@ public class LockScreenReceiver extends BroadcastReceiver {
             }
           }
         };
-
         int requestAudio = audio.requestAudioFocus(audioListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         if (requestAudio == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
           Log.d(TAG, "AUDIOFOCUS_REQUEST_GRANTED");
@@ -153,7 +146,6 @@ public class LockScreenReceiver extends BroadcastReceiver {
           noApplicationStart = true;
         }
         SystemClock.sleep(1000);
-
         requestAudio = audio.requestAudioFocus(audioListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         if (requestAudio == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
           Log.d(TAG, "2 AUDIOFOCUS_REQUEST_GRANTED");
@@ -164,39 +156,38 @@ public class LockScreenReceiver extends BroadcastReceiver {
         audio.abandonAudioFocus(audioListener);
 
         if (!noApplicationStart) {
-          AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-          intent2 = new Intent(context, LockScreenReceiver.class);
-          intent2.setFlags(1111);
-          intent2.putExtra("code", 1111);
-          PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent2,
-                  PendingIntent.FLAG_CANCEL_CURRENT);
-          alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeOfDelay, pendingIntent);
-          timeOfCreatingIntent2 = System.currentTimeMillis();
           Log.d(TAG, " point 3.2.2 screen on, creating pending intent with delay ");
-          needToStartLock = true;
-          saveInfoForOuterBoolean("isLocked2", true, context);
-
+          createPendingIntent(context, timeOfDelay);
         } else {
           Log.d(TAG, " point 3.2.2 screen on, no need to start ");
         }
       }
       noApplicationStart = false;
 
-    } else if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED) && !isPhoneCalling) {
-      if (lastDecisionTime == -1000
-              || lastDecisionTime + deltaTime < currentTime) {//30 second
-        Intent intent1 = new Intent(context, LockScreenApp.class);
-        intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Log.d(TAG, " point 3.3 ");
-        context.startActivity(intent1);
-      }
+    } else if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED) && !isPhoneCalling
+            && numOfLevelsToSolveToUnlockWhenScreenOn > 0) {
+      Log.d(TAG, " point 3.3 ACTION_BOOT_COMPLETED createPendingIntent ");
+      createPendingIntent(context, timeOfDelay);
     }
   }
 
+  protected void createPendingIntent(Context context, long timeOfDelay) {
+    AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+    intent2 = new Intent(context, LockScreenReceiver.class);
+    intent2.putExtra("code", 1111);
+    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent2,
+            PendingIntent.FLAG_CANCEL_CURRENT);
+    alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeOfDelay, pendingIntent);
+    timeOfCreatingIntent2 = System.currentTimeMillis();
+    //needToStartLock = true;
+    if (loadOuterInfoLong("code2", context) != INVALID) {
+      saveInfoForOuterBoolean("isLocked2", true, context);
+    }
+  }
 
   protected static long loadOuterInfoLong(String key, Context context) {
     SharedPreferences load = PreferenceManager.getDefaultSharedPreferences(context);
-    return load.getLong(key, -1000);
+    return load.getLong(key, INVALID);
   }
 
   protected static Boolean loadOuterInfoBoolean(String key, Context context) {
@@ -204,42 +195,41 @@ public class LockScreenReceiver extends BroadcastReceiver {
     return load.getBoolean(key, false);
   }
 
-
   protected static void saveInfoForOuterBoolean(String key, Boolean value, Context context) {
     SharedPreferences save = PreferenceManager.getDefaultSharedPreferences(context);
     SharedPreferences.Editor editor = save.edit();
     editor.putBoolean(key, value);
-    editor.commit();
+    editor.apply();
   }
 
   protected static void saveInfoForOuterInt(String key, int value, Context context) {
     SharedPreferences save = PreferenceManager.getDefaultSharedPreferences(context);
     SharedPreferences.Editor editor = save.edit();
     editor.putInt(key, value);
-    editor.commit();
+    editor.apply();
   }
 
   protected static void saveInfoForOuterLong(String key, long value, Context context) {
     SharedPreferences save = PreferenceManager.getDefaultSharedPreferences(context);
     SharedPreferences.Editor editor = save.edit();
     editor.putLong(key, value);
-    editor.commit();
+    editor.apply();
   }
 
   protected static int loadOuterInfoInt(String key, Context context) {
     SharedPreferences load = PreferenceManager.getDefaultSharedPreferences(context);
-    return load.getInt(key, -1000);
+    return load.getInt(key, INVALID);
   }
 
   private long calcDeltaTime(int days, int hours, int minutes) {
     long resultInSeconds = 0;
-    if (days != -1000) {
+    if (days != INVALID) {
       resultInSeconds = resultInSeconds + days * 24 * 3600;
     }
-    if (hours != -1000) {
+    if (hours != INVALID) {
       resultInSeconds = resultInSeconds + hours * 3600;
     }
-    if (minutes != -1000) {
+    if (minutes != INVALID) {
       resultInSeconds = resultInSeconds + days * 60;
     }
     return resultInSeconds;
@@ -257,7 +247,6 @@ public class LockScreenReceiver extends BroadcastReceiver {
       settingsActivity.finish();
     }
   }
-
 }
 
 

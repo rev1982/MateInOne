@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       android:layout_width="fill_parent"
+       android:layout_height="fill_parent"
+       android:orientation="vertical">
+
+    <ScrollView
+        android:id="@+id/scroll"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/mybg4">
+
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            >
+
+            <LinearLayout
+                android:id="@+id/linearLayout22333"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15sp"
+                android:layout_marginRight="25sp"
+                android:layout_marginTop="3sp">
+
+                <!--<TextView-->
+                <!--android:id="@+id/tArrow"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:gravity="left"-->
+                <!--android:layout_weight="5"-->
+                <!--android:text="@string/strArrow"-->
+                <!--android:textColor="@color/mybg10">-->
+                <!--</TextView>-->
+
+                <TextView
+                    android:id="@+id/tSettings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="@string/Settings"
+                    android:textColor="@color/mybg9">
+                </TextView>
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/checkBox3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginLeft="15sp"
+                android:layout_marginRight="15sp"
+                android:layout_marginTop="3sp"
+                android:checked="false"
+                android:text="@string/password"
+                android:textColor="@color/mybg9"/>
+
+            <LinearLayout
+                android:id="@+id/linearLayout1202"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:layout_marginTop="2sp">
+
+                <TextView
+                    android:id="@+id/tOnlyDigits"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5sp"
+                    android:layout_marginRight="5sp"
+                    android:gravity="left"
+                    android:text="@string/onlyDigits">
+                </TextView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:layout_marginTop="3sp">
+
+                <EditText
+                    android:id="@+id/et1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="3sp"
+                    android:layout_marginRight="15sp"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:inputType="numberPassword">
+                </EditText>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout1201"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:layout_marginTop="3sp">
+
+                <TextView
+                    android:id="@+id/tApprove"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5sp"
+                    android:layout_marginRight="5sp"
+                    android:layout_marginTop="3sp"
+                    android:gravity="left"
+                    android:text="@string/ApproveTheSecretCode">
+                </TextView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:layout_marginTop="3sp">
+
+                <EditText
+                    android:id="@+id/et2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="3sp"
+                    android:layout_marginRight="15sp"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:inputType="numberPassword">
+                </EditText>
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/checkBox2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginLeft="15sp"
+                android:layout_marginRight="15sp"
+                android:layout_marginTop="3sp"
+                android:checked="false"
+                android:text="@string/Illuminate"
+                android:textColor="@color/mybg9"/>
+
+
+            <LinearLayout
+                android:id="@+id/linearLayout222"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5sp"
+                android:layout_marginRight="10sp"
+                android:layout_marginTop="3sp">
+
+                <TextView
+                    android:id="@+id/tNumOfLevels"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_marginRight="2sp"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:text="@string/SetNumberOfLevelsToSolveBeforeUnlock">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:gravity="center"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout223"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5sp"
+                android:layout_marginRight="10sp"
+                android:layout_marginTop="3sp">
+
+                <TextView
+                    android:id="@+id/tNumOfAttempts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_marginRight="2sp"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:text="@string/SetNumberOfAttempts">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/spinner2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="0sp"
+                    android:layout_marginRight="0sp"
+                    android:layout_weight="5"
+                    android:gravity="center"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tDelay1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15sp"
+                android:layout_marginRight="12sp"
+                android:layout_marginTop="8sp"
+                android:gravity="left"
+                android:text="@string/SetDelay">
+            </TextView>
+
+            <LinearLayout
+                android:id="@+id/linearLayout224"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5sp"
+                android:layout_marginRight="10sp">
+
+                <TextView
+                    android:id="@+id/tDelay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_marginRight="2sp"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:text="@string/DelayInSeconds">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/spinner0"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_weight="5"
+                    android:gravity="center"/>
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/tAmountOfTimeToLiveDeviceUnlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15sp"
+                android:layout_marginRight="12sp"
+                android:gravity="left"
+                android:text="@string/SetAmountOfTimeToLeaveTheDeviceUnlock">
+            </TextView>
+
+            <LinearLayout
+                android:id="@+id/linearLayout2233"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5sp"
+                android:layout_marginRight="10sp"
+                android:layout_marginTop="3sp">
+
+                <TextView
+                    android:id="@+id/tDays"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_marginRight="2sp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/Days">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/spinner3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginLeft="0sp"
+                    android:layout_marginRight="0sp"
+                    android:layout_weight="1"
+                    android:gravity="left"/>
+
+                <TextView
+                    android:id="@+id/tHours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="1sp"
+                    android:layout_marginRight="2sp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/Hours">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/spinner4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginLeft="0sp"
+                    android:layout_marginRight="0sp"
+                    android:layout_weight="1"
+                    android:gravity="left"/>
+
+                <TextView
+                    android:id="@+id/tMinutes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="1sp"
+                    android:layout_marginRight="2sp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/Minutes"
+                    android:textSize="14sp">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/spinner5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginLeft="0sp"
+                    android:layout_marginRight="0sp"
+                    android:layout_weight="1"
+                    android:gravity="left"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/tArrow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15sp"
+        android:layout_marginRight="25sp"
+        android:layout_marginTop="6sp"
+        android:gravity="left"
+        android:text="@string/strArrow"
+        android:textColor="@color/mybg10">
+    </TextView>
+</merge>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       android:layout_width="fill_parent"
+       android:id="@+id/mergesecond"
+       android:layout_height="fill_parent"
+       android:orientation="vertical">
+    <TextView
+        android:id="@+id/tEnterPassword"
+        android:gravity="start"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:textColor="@color/mybg10">
+    </TextView>
+    <TextView
+        android:id="@+id/tArrow"
+        android:gravity="start"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="@string/strArrow"
+        android:textColor="@color/mybg10">
+    </TextView>
+</merge>

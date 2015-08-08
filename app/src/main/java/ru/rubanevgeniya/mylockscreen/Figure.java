@@ -4,7 +4,20 @@ package ru.rubanevgeniya.mylockscreen;
 import java.util.ArrayList;
 
 public abstract class Figure {
-  protected enum Type {pawn, king, bishop, queen, knight, rook}
+  protected enum Type {
+    pawn, king, bishop, queen, knight, rook;
+
+    public static final String STRING = "pKBQNR";
+
+    public char toChar() {
+      return STRING.charAt(this.ordinal());
+    }
+
+    public static Type fromChar(char c) {
+      return c == 'P' ? pawn : Type.values()[STRING.indexOf(c)];
+    }
+  }
+
   protected String image;
   protected int posX;
   protected int posY;
@@ -25,5 +38,4 @@ public abstract class Figure {
   void findPossibleMove(Figure[][] figureOnBoard) {
 
   }
-
 }

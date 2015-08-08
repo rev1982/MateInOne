@@ -1,8 +1,8 @@
 package ru.rubanevgeniya.mylockscreen;
 
 public class Knight extends Figure {
-  public Knight(boolean isWhite, int posX, int posY, String image, Type type) {
-    super(isWhite, posX, posY, image, type);
+  public Knight(boolean isWhite, int posX, int posY) {
+    super(isWhite, posX, posY, "m", Type.knight);
   }
 
   @Override
@@ -29,5 +29,4 @@ public class Knight extends Figure {
       possibleMove.add(pos);
     }
   }
-
 }

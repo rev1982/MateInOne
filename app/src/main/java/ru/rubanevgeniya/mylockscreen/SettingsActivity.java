@@ -1,66 +1,81 @@
 package ru.rubanevgeniya.mylockscreen;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import java.lang.ref.WeakReference;
 
 
 public class SettingsActivity extends Activity {
+  public static final int INVALID = -1000;
   private EditText editText1;
   private EditText editText2;
-  private final Integer[] levelsToSolveOrAttemptsToResolve = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  private final Integer[] attemptsToResolve = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  private final Integer[] levelsToSolve = new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   private final Integer[] days = new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-  private final Integer[] hours = new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+  private final Integer[] hours = new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+          11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
   private final Integer[] minutes = new Integer[]{0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55};
   private final Integer[] delays = new Integer[]{10, 20, 30, 40, 50, 60, 90, 120, 180};
   private static final String TAG = "Log SettingsActivity : ";
   private boolean isPortrait;
   private static boolean needToFinish;
-
+  private Handler handler;
+  private int smallFontSize;
+  private static int mainColor;
+  private static int pinkColor;
+  private static int greenColor;
 
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_settings);
+    setContentView(R.layout.setting_merge);
     LockScreenReceiver.needToAlive = false;
     LockScreenReceiver.settingsActivity = this;
     if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
       isPortrait = true;
     }
-
     handler = new SettingsHandler(this);
     int fontSize = (int) getResources().getDimension(R.dimen.textsizesetting);
-    int smallFontSize = (fontSize / 8 * 5);
+    smallFontSize = (fontSize / 8 * 5);
+    mainColor = getResources().getColor(R.color.mybg4);
+    pinkColor = getResources().getColor(R.color.pink);
+    greenColor = getResources().getColor(R.color.green);
 
+    final CheckBox checkBoxPassword = (CheckBox) findViewById(R.id.checkBox3);
+    checkBoxPassword.setTextSize(smallFontSize);
+    TextView textViewArrow = (TextView) findViewById(R.id.tArrow);
+    textViewArrow.setTextSize(fontSize);
+    textViewArrow.setTypeface(Typefaces.get(this, "fonts/fontawesome.ttf"));
+    textViewArrow.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        startLockScreenApp();
+      }
+    });
     TextView textViewDelay = (TextView) findViewById(R.id.tDelay);
     textViewDelay.setTextSize(smallFontSize);
     TextView textViewDelay1 = (TextView) findViewById(R.id.tDelay1);
     textViewDelay1.setTextSize(smallFontSize);
-
     TextView textViewSettings = (TextView) findViewById(R.id.tSettings);
     textViewSettings.setTextSize(fontSize);
-    TextView textViewEnterSecretCode = (TextView) findViewById(R.id.tEnterSecretCode);
-    textViewEnterSecretCode.setTextSize(smallFontSize);
     TextView textViewOnlyDigits = (TextView) findViewById(R.id.tOnlyDigits);
     textViewOnlyDigits.setTextSize(fontSize / 8 * 4);
     TextView textViewApprove = (TextView) findViewById(R.id.tApprove);
@@ -83,27 +98,79 @@ public class SettingsActivity extends Activity {
 
     editText1 = (EditText) findViewById(R.id.et1);
     editText1.setTextSize((smallFontSize));
+
+
+    editText1.addTextChangedListener(new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      }
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+        String str1 = editText1.getText().toString();
+        int len = str1.length();
+        if (len < 7 && len > 0) {
+          editText1.setTextColor(greenColor);
+          editText1.setBackgroundColor(mainColor);
+        } else if (len > 6) {
+          editText1.setTextColor(Color.RED);
+          editText1.setBackgroundColor(mainColor);
+        }
+        editText2.setText("");
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {
+
+      }
+    });
     editText2 = (EditText) findViewById(R.id.et2);
     editText2.setTextSize(smallFontSize);
-    Button buttonBack = (Button) findViewById(R.id.btnBack);
-    buttonBack.setTextSize(smallFontSize);
-    Button buttonCancel = (Button) findViewById(R.id.btnCancel);
-    buttonCancel.setTextSize(smallFontSize);
-    Button buttonEnter = (Button) findViewById(R.id.btnEnter);
-    buttonEnter.setTextSize(smallFontSize);
+    editText2.addTextChangedListener(new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+      }
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+        String str2 = editText2.getText().toString();
+        String str1 = editText1.getText().toString();
+        if (str2.equals(str1)) {
+          editText2.setBackgroundColor(mainColor);
+          editText2.setTextColor(greenColor);
+        } else if (str2.length() == 0 && checkBoxPassword.isChecked() && str1.length() > 0) {
+          editText2.setBackgroundColor(pinkColor);
+        } else if (str2.length() > 0 && checkBoxPassword.isChecked()) {
+          editText2.setBackgroundColor(mainColor);
+          editText2.setTextColor(Color.RED);
+        }
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {
+        String str2 = editText2.getText().toString();
+        String str1 = editText1.getText().toString();
+        if (str2.equals(editText1.getText().toString()) && str2.length() > 0) {
+          editText2.setBackgroundColor(mainColor);
+          editText2.setTextColor(greenColor);
+          LockScreenReceiver.saveInfoForOuterLong("code2", Long.parseLong(str2), getBaseContext());
+        } else if (str2.length() == 0 && checkBoxPassword.isChecked() && str1.length() > 0) {
+          editText2.setBackgroundColor(pinkColor);
+        } else if ((str2.length() > 0 && checkBoxPassword.isChecked())) {
+          editText2.setBackgroundColor(mainColor);
+          editText2.setTextColor(Color.RED);
+        }
+      }
+    });
     Spinner spinnerLevels = (Spinner) findViewById(R.id.spinner);
-    forSpinner(spinnerLevels, "amountOfLevelsToSolve3", levelsToSolveOrAttemptsToResolve);
+    forSpinner(spinnerLevels, "amountOfLevelsToSolve3", levelsToSolve);
     Spinner spinnerAttempts = (Spinner) findViewById(R.id.spinner2);
 
-    if (isPortrait) {
-      spinnerLevels.setGravity(Gravity.BOTTOM);
-      spinnerAttempts.setGravity(Gravity.BOTTOM);
-    } else {
-      spinnerLevels.setGravity(Gravity.TOP);
-      spinnerAttempts.setGravity(Gravity.TOP);
-    }
+    spinnerLevels.setGravity(isPortrait ? Gravity.BOTTOM : Gravity.TOP);
+    spinnerAttempts.setGravity(isPortrait ? Gravity.BOTTOM : Gravity.TOP);
 
-    forSpinner(spinnerAttempts, "amountOfAttemptsToResolve3", levelsToSolveOrAttemptsToResolve);
+    forSpinner(spinnerAttempts, "amountOfAttemptsToResolve3", attemptsToResolve);
     Spinner spinnerDays = (Spinner) findViewById(R.id.spinner3);
     forSpinner(spinnerDays, "days3", days);
     Spinner spinnerHours = (Spinner) findViewById(R.id.spinner4);
@@ -132,30 +199,37 @@ public class SettingsActivity extends Activity {
     });
 
 
-    View.OnClickListener onClickListener = new View.OnClickListener() {
+    long code = LockScreenReceiver.loadOuterInfoLong("code2", getBaseContext());
+    checkBoxPassword.setChecked(code != INVALID);
+    if (code != INVALID) {
+      editText1.setText(Long.toString(code));
+      editText1.setTextColor(greenColor);
+      editText2.setText(Long.toString(code));
+      editText2.setTextColor(greenColor);
+      editText1.setEnabled(true);
+      editText2.setEnabled(true);
+    } else {
+      editText1.setEnabled(false);
+      editText2.setEnabled(false);
+    }
+    checkBoxPassword.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
       @Override
-      public void onClick(View v) {
-        switch (v.getId()) {
-          case R.id.btnCancel:
-            editText1.setText("");
-            editText2.setText("");
-            break;
-          case R.id.btnBack:
-            startLockScreenApp();
-            break;
-          case R.id.btnEnter:
-            checkSecretCode();
-            break;
+      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+          editText1.setEnabled(true);
+          editText2.setEnabled(true);
+        } else {
+          editText1.setEnabled(false);
+          editText2.setEnabled(false);
+          LockScreenReceiver.saveInfoForOuterLong("code2", INVALID, getBaseContext());
+          editText1.setText("");
+          editText2.setText("");
         }
       }
-    };
-
-    buttonEnter.setOnClickListener(onClickListener);
-    buttonCancel.setOnClickListener(onClickListener);
-    buttonBack.setOnClickListener(onClickListener);
+    });
   }
 
-  private void forSpinner(Spinner spinner, final String key1, final Integer[] dataArray) {
+  private void forSpinner(final Spinner spinner, final String key1, final Integer[] dataArray) {
     ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this, R.layout.support_simple_spinner_dropdown_item, dataArray);
     adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
     spinner.setAdapter(adapter);
@@ -163,6 +237,9 @@ public class SettingsActivity extends Activity {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         LockScreenReceiver.saveInfoForOuterInt(key1, dataArray[position], getBaseContext());
+        if (parent.getChildAt(position) != null) {
+          ((TextView) parent.getChildAt(position)).setTextSize(smallFontSize);
+        }
       }
 
       @Override
@@ -172,7 +249,7 @@ public class SettingsActivity extends Activity {
     });
     int amount = LockScreenReceiver.loadOuterInfoInt(key1, this);
     int position = 0;
-    if (amount != -1000) {
+    if (amount != INVALID) {
       for (int i = 0; i < dataArray.length; i++) {
         if (dataArray[i] == amount) {
           position = i;
@@ -183,47 +260,18 @@ public class SettingsActivity extends Activity {
     }
   }
 
-
   protected void startLockScreenApp() {
     Log.d(TAG, " start lockScreenApp from settings");
-
-    AlarmManager alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-    Intent intent2 = new Intent(this, LockScreenReceiver.class);
-    intent2.setFlags(1111);
-    intent2.putExtra("code", 1111);
-    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent2,
-            PendingIntent.FLAG_CANCEL_CURRENT);
-    alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 500, pendingIntent);
-
+    Intent intent = new Intent(this, LockScreenApp.class);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    startActivity(intent);
     this.finish();
   }
-
-  private void checkSecretCode() {
-    String code1 = editText1.getText().toString();
-    String code2 = editText2.getText().toString();
-    if (code1.length() > 6) {
-      Toast toast = Toast.makeText(this, getResources().getString(R.string.lengthIsMoteThen6), Toast.LENGTH_LONG);
-      toast.show();
-      editText1.setText("");
-      editText2.setText("");
-    } else if (code1.length() == 0) {
-      Toast toast = Toast.makeText(this, getResources().getString(R.string.lengthIs0), Toast.LENGTH_LONG);
-      toast.show();
-    } else if (!code1.equals(code2)) {
-      Toast toast = Toast.makeText(this, getResources().getString(R.string.approveSecretCodeCorrectly), Toast.LENGTH_LONG);
-      toast.show();
-      editText2.setText("");
-    } else {
-      LockScreenReceiver.saveInfoForOuterLong("code2", Long.parseLong(code1), this);
-      Log.d(TAG, "saving code = " + code1);
-
-    }
-  }
-
 
   @Override
   public void onResume() {
     needToFinish = false;
+    LockScreenReceiver.onTop = getClass();//***
     Log.d(TAG, " SettingActivity onResume, needToFinish = " + false);
     super.onResume();
   }
@@ -237,14 +285,12 @@ public class SettingsActivity extends Activity {
 
   @Override
   public void onPause() {
+    LockScreenReceiver.onTop = null;//***
     needToFinish = true;
     Log.d(TAG, " settings on pause, needToFinish = " + true);
     handler.sendMessageDelayed(handler.obtainMessage(0, 0, 0), 4000); //to finish settings if it is not just orientation change
-
     super.onPause();
   }
-
-  Handler handler;
 
   protected void handlerMethod() {
     if (needToFinish) {
@@ -270,5 +316,9 @@ public class SettingsActivity extends Activity {
     }
   }
 
+  @Override
+  public  void onBackPressed(){
+    startLockScreenApp();
+  }
 
 }
