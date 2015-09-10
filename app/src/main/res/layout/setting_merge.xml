@@ -26,16 +26,6 @@
                 android:layout_marginRight="25sp"
                 android:layout_marginTop="3sp">
 
-                <!--<TextView-->
-                <!--android:id="@+id/tArrow"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:gravity="left"-->
-                <!--android:layout_weight="5"-->
-                <!--android:text="@string/strArrow"-->
-                <!--android:textColor="@color/mybg10">-->
-                <!--</TextView>-->
-
                 <TextView
                     android:id="@+id/tSettings"
                     android:layout_width="match_parent"
@@ -51,7 +41,7 @@
                 android:id="@+id/checkBox3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
+                android:layout_gravity="start"
                 android:layout_marginLeft="15sp"
                 android:layout_marginRight="15sp"
                 android:layout_marginTop="3sp"
@@ -73,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5sp"
                     android:layout_marginRight="5sp"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:text="@string/onlyDigits">
                 </TextView>
             </LinearLayout>
@@ -93,7 +83,7 @@
                     android:layout_marginLeft="3sp"
                     android:layout_marginRight="15sp"
                     android:layout_weight="1"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:inputType="numberPassword">
                 </EditText>
             </LinearLayout>
@@ -113,7 +103,7 @@
                     android:layout_marginLeft="5sp"
                     android:layout_marginRight="5sp"
                     android:layout_marginTop="3sp"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:text="@string/ApproveTheSecretCode">
                 </TextView>
             </LinearLayout>
@@ -133,7 +123,7 @@
                     android:layout_marginLeft="3sp"
                     android:layout_marginRight="15sp"
                     android:layout_weight="1"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:inputType="numberPassword">
                 </EditText>
             </LinearLayout>
@@ -142,7 +132,7 @@
                 android:id="@+id/checkBox2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
+                android:layout_gravity="start"
                 android:layout_marginLeft="15sp"
                 android:layout_marginRight="15sp"
                 android:layout_marginTop="3sp"
@@ -161,21 +151,19 @@
 
                 <TextView
                     android:id="@+id/tNumOfLevels"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10sp"
                     android:layout_marginRight="2sp"
                     android:layout_weight="1"
-                    android:gravity="left"
-                    android:text="@string/SetNumberOfLevelsToSolveBeforeUnlock">
+                    android:gravity="start"
+                    >
                 </TextView>
-
                 <Spinner
                     android:id="@+id/spinner"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="5"
-                    android:gravity="center"
+                    android:gravity="end"
                     />
             </LinearLayout>
 
@@ -189,62 +177,47 @@
 
                 <TextView
                     android:id="@+id/tNumOfAttempts"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10sp"
                     android:layout_marginRight="2sp"
                     android:layout_weight="1"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:text="@string/SetNumberOfAttempts">
                 </TextView>
 
                 <Spinner
                     android:id="@+id/spinner2"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="0sp"
-                    android:layout_marginRight="0sp"
-                    android:layout_weight="5"
-                    android:gravity="center"
+                    android:gravity="end"
                     />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/tDelay1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="15sp"
-                android:layout_marginRight="12sp"
-                android:layout_marginTop="8sp"
-                android:gravity="left"
-                android:text="@string/SetDelay">
-            </TextView>
 
             <LinearLayout
                 android:id="@+id/linearLayout224"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0sp"
                 android:layout_marginLeft="5sp"
                 android:layout_marginRight="10sp">
 
                 <TextView
                     android:id="@+id/tDelay"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10sp"
                     android:layout_marginRight="2sp"
                     android:layout_weight="1"
-                    android:gravity="left"
-                    android:text="@string/DelayInSeconds">
+                    android:gravity="start"
+                    android:text="@string/SetDelay">
                 </TextView>
 
                 <Spinner
                     android:id="@+id/spinner0"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top"
-                    android:layout_weight="5"
-                    android:gravity="center"/>
+                    android:gravity="end"/>
             </LinearLayout>
 
 
@@ -254,7 +227,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15sp"
                 android:layout_marginRight="12sp"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/SetAmountOfTimeToLeaveTheDeviceUnlock">
             </TextView>
 
@@ -268,67 +241,57 @@
 
                 <TextView
                     android:id="@+id/tDays"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10sp"
                     android:layout_marginRight="2sp"
                     android:layout_weight="1"
-                    android:gravity="right"
+                    android:gravity="center"
                     android:text="@string/Days">
                 </TextView>
 
                 <Spinner
                     android:id="@+id/spinner3"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top"
-                    android:layout_marginLeft="0sp"
-                    android:layout_marginRight="0sp"
-                    android:layout_weight="1"
-                    android:gravity="left"/>
+                    android:gravity="end"/>
 
                 <TextView
                     android:id="@+id/tHours"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="1sp"
                     android:layout_marginRight="2sp"
                     android:layout_weight="1"
-                    android:gravity="right"
+                    android:gravity="center"
                     android:text="@string/Hours">
                 </TextView>
 
                 <Spinner
                     android:id="@+id/spinner4"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"
-                    android:layout_marginLeft="0sp"
-                    android:layout_marginRight="0sp"
-                    android:layout_weight="1"
-                    android:gravity="left"/>
+                    android:gravity="start"/>
 
                 <TextView
                     android:id="@+id/tMinutes"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="1sp"
                     android:layout_marginRight="2sp"
                     android:layout_weight="1"
-                    android:gravity="right"
+                    android:gravity="center"
                     android:text="@string/Minutes"
-                    android:textSize="14sp">
+                    >
                 </TextView>
 
                 <Spinner
                     android:id="@+id/spinner5"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"
-                    android:layout_marginLeft="0sp"
-                    android:layout_marginRight="0sp"
-                    android:layout_weight="1"
-                    android:gravity="left"/>
+                    android:gravity="end"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -341,8 +304,23 @@
         android:layout_marginLeft="15sp"
         android:layout_marginRight="25sp"
         android:layout_marginTop="6sp"
-        android:gravity="left"
+        android:gravity="start"
         android:text="@string/strArrow"
         android:textColor="@color/mybg10">
     </TextView>
+    <LinearLayout
+        android:id="@+id/linearLayout2233333"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5sp"
+        android:layout_marginRight="15sp"
+        android:gravity="end"
+        android:layout_marginTop="10sp">
+    <ImageView
+        android:id="@+id/iconView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end">
+    </ImageView>
+    </LinearLayout>
 </merge>

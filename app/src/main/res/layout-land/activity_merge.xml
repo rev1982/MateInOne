@@ -5,12 +5,12 @@
        android:layout_height="fill_parent"
        android:orientation="vertical">
 
-    <ru.rubanevgeniya.mylockscreen.BoardViewLand
+    <ru.rubanevgeniya.mateinone.BoardViewLand
         android:id="@+id/BoardViewLand"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"/>
 
-    <ru.rubanevgeniya.mylockscreen.ChessView
+    <ru.rubanevgeniya.mateinone.ChessView
         android:id="@+id/ChessView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"/>

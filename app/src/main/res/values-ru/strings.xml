@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">Одноходовки</string>
     <string name="action_settings">Settings</string>
-
     <string name="blackToMove">ход черных </string>
     <string name="andCheckmate"> </string>
     <string name="whiteToMove">ход белых </string>
@@ -11,21 +10,19 @@
     <string name="level"> задачу</string>
     <string name="toUnlockSolve0">чтобы разблокировать экран,</string>
     <string name="toUnlockSolve">решите </string>
-
     <string name="toUnlockTouch">прикоснитесь к экрану,</string>
     <string name="touch">чтобы его разблокировать </string>
-
     <string name="rusString">решенных задач : </string>
     <string name="solved"> </string>
     <string name="NumberOfLevels">Количество задач : </string>
     <string name="NumberOfSolvedLevels">Решенных задач : </string>
     <string name="NumberOfAttempts">Попыток : </string>
-
     <string name="toUnlock">чтобы разблокировать экран, поставьте мат оппоненту или нажмите кнопку с замком, чтобы ввести пароль</string>
     <string name="chooseOneItem">выберите одну фигуру</string>
     <string name="password">Пароль</string>
-    <string name="enterTheSecretCodeToUnlock"> Введите пароль, \n чтобы разблокировать экран</string>
-    <string name="enterTheSecretCodeToOpenSettings">Введите пароль, \n чтобы войти в настройки</string>
+    <string name="enterThePassword">Введите пароль,</string>
+    <string name="enterTheSecretCodeToUnlock">чтобы разблокировать экран</string>
+    <string name="enterTheSecretCodeToOpenSettings">чтобы войти в настройки</string>
     <string name="enter">Ввести</string>
     <string name="backToChess"> Обратно к шахматам   </string>
     <string name="Settings">Настройки</string>
@@ -35,15 +32,14 @@
     <string name="lengthIsMoteThen6">длина более 6 символов</string>
     <string name="lengthIs0">длина равна 0</string>
     <string name="approveSecretCodeCorrectly">правильно подтвердите пароль</string>
-    <string name="onlyDigits">только цифры от 0 до 9; максимум 6 символов</string>
+    <string name="onlyDigits">только цифры от 0 до 9</string>
     <string name="ApproveTheSecretCode">Подтвердите пароль</string>
     <string name="cancel">Oтмена</string>
     <string name="Illuminate">Подсвечивать все возможные ходы выбранной шахматной фигуры</string>
-    <string name="SetNumberOfLevelsToSolveBeforeUnlock">Количество задач, которое нужно решить для разблокировки экрана \n     </string>
+    <string name="SetNumberOfLevelsToSolveBeforeUnlock">Количество задач, которое нужно решить для разблокировки экрана</string>
     <string name="SetNumberOfLevelsToSolveBeforeUnlockHorizontal">Количество задач, которое нужно решить для разблокировки экрана</string>
-    <string name="SetNumberOfAttempts">Количество попыток при решении одной задачи \n      </string>
-    <string name="SetDelay">Временной интервал между моментом включения устройства и моментом блокировки экрана</string>
-    <string name="DelayInSeconds">Интервал (секунды) : </string>
+    <string name="SetNumberOfAttempts">Количество попыток при решении одной задачи</string>
+    <string name="SetDelay">Временной интервал между моментом включения устройства и моментом блокировки экрана (секунды)</string>
     <string name="SetAmountOfTimeToLeaveTheDeviceUnlock">Интервал времени после успешного решения, в течении которого устройство не будет блокироваться</string>
     <string name="Days">Дни: </string>
     <string name="Hours">  Часы: </string>
@@ -61,6 +57,6 @@
     <string name="Pawn">п</string>
     <string name="capture">:</string>
     <string name="mate">х</string>
+    <string name="strArrow">\uF060</string>
     <string name="stalemate">пат</string>
-
 </resources>

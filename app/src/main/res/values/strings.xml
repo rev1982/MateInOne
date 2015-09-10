@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Mate in 1</string>
     <string name="action_settings">Settings</string>
-
     <string name="blackToMove">black to move </string>
     <string name="andCheckmate">and checkmate</string>
     <string name="whiteToMove">white to move </string>
@@ -11,20 +10,18 @@
     <string name="rusString"></string>
     <string name="toUnlockSolve">solve</string>
     <string name="toUnlockSolve0">to unlock</string>
-
     <string name="toUnlockTouch">to unlock</string>
     <string name="touch">touch the screen </string>
     <string name="solved"> solved </string>
     <string name="NumberOfLevels">Number of chess problems = </string>
     <string name="NumberOfSolvedLevels">Number of solved problems = </string>
     <string name="NumberOfAttempts">Number of attempts = </string>
-
     <string name="toUnlock">to unlock checkmate the opponent or press unlock icon to enter the password</string>
     <string name="chooseOneItem">choose one item</string>
     <string name="password">Password</string>
-    <string name="enterTheSecretCodeToUnlock">Enter the password \n to unlock the screen</string>
-    <string name="enterTheSecretCodeToOpenSettings">Enter the password \n to open settings</string>
-    <string name="clear">clear</string>
+    <string name="enterThePassword">Enter the password</string>
+    <string name="enterTheSecretCodeToUnlock">to unlock the screen</string>
+    <string name="enterTheSecretCodeToOpenSettings">to open settings</string>
     <string name="enter">Enter</string>
     <string name="backToChess">back to chess   </string>
     <string name="Settings">Settings</string>
@@ -34,15 +31,14 @@
     <string name="lengthIsMoteThen6">length is more then 6</string>
     <string name="lengthIs0">length is 0</string>
     <string name="approveSecretCodeCorrectly">approve password correctly</string>
-    <string name="onlyDigits">only digits from 0 to 9; 6 digits is maximum</string>
+    <string name="onlyDigits">only digits from 0 to 9</string>
     <string name="ApproveTheSecretCode">Approve the password</string>
     <string name="cancel">Cancel</string>
     <string name="Illuminate">Illuminate all possible moves for chosen chess piece</string>
-    <string name="SetNumberOfLevelsToSolveBeforeUnlock">Set number of chess problems to solve before unlock the screen  </string>
-    <string name="SetNumberOfLevelsToSolveBeforeUnlockHorizontal"> Set number of chess problems to solve before unlock the screen </string>
+    <string name="SetNumberOfLevelsToSolveBeforeUnlock">Set number of chess problems to solve before unlock the screen </string>
+    <string name="SetNumberOfLevelsToSolveBeforeUnlockHorizontal">Set number of chess problems to solve before unlock the screen</string>
     <string name="SetNumberOfAttempts">Set number of attempts to solve one chess problem </string>
     <string name="SetDelay">Set delay in seconds between the moment of turning on the device and the moment of starting the lockscreen</string>
-    <string name="DelayInSeconds">Delay in seconds : </string>
     <string name="SetAmountOfTimeToLeaveTheDeviceUnlock">Set amount of time to leave the device unlock after the moment of last successful solving</string>
     <string name="Days">Days:</string>
     <string name="Hours">Hours:</string>
@@ -62,11 +58,5 @@
     <string name="mate">#</string>
     <string name="strArrow">\uF060</string>
     <string name="stalemate">stalemate</string>
-
-
-    
-
-
-
 
 </resources>

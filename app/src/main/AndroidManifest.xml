@@ -1,53 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ru.rubanevgeniya.mylockscreen" >
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <!-- TODO: find minSdk version -->
-    <!-- <uses-sdk android:minSdkVersion="16"/> -->
+<manifest package="ru.rubanevgeniya.mateinone"
+          xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+    <uses-sdk android:minSdkVersion="15"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/icon"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
-            android:name=".SecondActivity"
-            android:label="@string/app_name" >
+            android:name="ru.rubanevgeniya.mateinone.SecondActivity"
+            android:label="@string/app_name">
         </activity>
         <activity
-            android:name=".SettingsActivity"
-            android:windowSoftInputMode="stateHidden"
-            android:label="@string/app_name" >
+            android:name="ru.rubanevgeniya.mateinone.SettingsActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateHidden">
         </activity>
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:name="ru.rubanevgeniya.mateinone.MainActivity"
+            android:label="@string/app_name">
         </activity>
 
-        <activity android:label="@string/app_name"  android:name=".LockScreenApp">
+        <activity
+            android:name="ru.rubanevgeniya.mateinone.LockScreenApp"
+            android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
         <service
-            android:name=".ServiceToStartReceiver"
+            android:name="ru.rubanevgeniya.mateinone.ServiceToStartReceiver"
             android:enabled="true"
-            android:exported="false" >
+            android:exported="false">
         </service>
 
-        <receiver android:name=".PhoneReceiver">
+        <receiver android:name="ru.rubanevgeniya.mateinone.PhoneReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.PHONE_STATE" />
+                <action android:name="android.intent.action.PHONE_STATE"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:enabled="true" android:name=".LockScreenReceiver"
+        <receiver
+            android:name="ru.rubanevgeniya.mateinone.LockScreenReceiver"
+            android:enabled="true"
             android:exported="true">
-            <intent-filter >
+            <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
             <intent-filter>
@@ -57,7 +62,7 @@
                 <action android:name="android.intent.action.ACTION_SCREEN_OFF"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </receiver>
 
